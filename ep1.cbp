@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<CodeBlocks_project_file>
+	<FileVersion major="1" minor="6" />
+	<Project>
+		<Option title="ep1" />
+		<Option makefile="makefile" />
+		<Option makefile_is_custom="1" />
+		<Option execution_dir="./" />
+		<Option pch_mode="2" />
+		<Option compiler="gcc" />
+		<MakeCommands>
+			<Build command="$make -f $makefile $target" />
+			<CompileFile command="$make -f $makefile $file" />
+			<Clean command="$make -f $makefile clean" />
+			<DistClean command="$make -f $makefile distclean$target" />
+			<AskRebuildNeeded command="$make -q -f $makefile $target" />
+			<SilentBuild command="$make -f $makefile $target &gt; $(CMD_NULL)" />
+		</MakeCommands>
+		<Build>
+			<Target title="ep1">
+				<Option output="ep1" prefix_auto="1" extension_auto="1" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<MakeCommands>
+					<Build command="$make -f $makefile $target" />
+					<CompileFile command="$make -f $makefile $file" />
+					<Clean command="$make -f $makefile clean_$target" />
+					<DistClean command="$make -f $makefile distclean$target" />
+					<AskRebuildNeeded command="$make -q -f $makefile $target" />
+					<SilentBuild command="$make -f $makefile $target &gt; $(CMD_NULL)" />
+				</MakeCommands>
+			</Target>
+			<Target title="ep1sh">
+				<Option output="ep1sh" prefix_auto="1" extension_auto="1" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<MakeCommands>
+					<Build command="$make -f $makefile $target" />
+					<CompileFile command="$make -f $makefile $file" />
+					<Clean command="$make -f $makefile clean_$target" />
+					<DistClean command="$make -f $makefile distclean$target" />
+					<AskRebuildNeeded command="$make -q -f $makefile $target" />
+					<SilentBuild command="$make -f $makefile $target &gt; $(CMD_NULL)" />
+				</MakeCommands>
+			</Target>
+		</Build>
+		<Compiler>
+			<Add option="-pedantic" />
+			<Add option="-Wall" />
+			<Add option="-std=c99" />
+			<Add directory="src/" />
+		</Compiler>
+		<Linker>
+			<Add library="pthread" />
+		</Linker>
+		<Unit filename="src/ep1/ep1.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/ep1/threadlist.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/ep1/threadlist.h" />
+		<Unit filename="src/ep1sh/command.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/ep1sh/command.h" />
+		<Unit filename="src/ep1sh/ep1sh.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/util.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/util.h" />
+		<Extensions>
+			<code_completion />
+			<debugger />
+			<envvars />
+		</Extensions>
+	</Project>
+</CodeBlocks_project_file>

@@ -7,6 +7,7 @@
 #include <readline/history.h>
 
 #include "command.h"
+#include "util.h"
 
 #define CWD_BUFFER 1024
 
@@ -21,16 +22,16 @@ int main(void) {
 	snprintf(prompt, CWD_BUFFER, "[%s] ", cwd);
 
 	while((rl = readline(prompt)) != NULL) {
-		
+
 		/* Encerra o shell */
 		if(strcmp(rl, "exit") == 0) break;
 
 		/* Nao houve comando */
-		if(strcmp(rl, "") == 0) continue; 
-		
-		
+		if(strcmp(rl, "") == 0) continue;
+
+
 		command = command_read(rl);
-			
+
 		if(strcmp(command->argv[0], "cd") == 0) {
 			chdir(command->argv[1]);
 
@@ -42,12 +43,15 @@ int main(void) {
 
 		}
 
+		free(cwd)
 		add_history(rl);
 		cwd = getcwd(NULL, CWD_BUFFER);
 		snprintf(prompt, CWD_BUFFER, "[%s] ", cwd);
+		free(rl);
 		command_destroy(command);
 	}
 
+	free(cwd);
 	free(rl);
 	return 0;
 }
