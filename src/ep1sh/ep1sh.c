@@ -43,7 +43,7 @@ int main(void) {
 
 		}
 
-		free(cwd)
+		free(cwd);
 		add_history(rl);
 		cwd = getcwd(NULL, CWD_BUFFER);
 		snprintf(prompt, CWD_BUFFER, "[%s] ", cwd);
