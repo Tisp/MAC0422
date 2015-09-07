@@ -11,7 +11,7 @@
 
 #define CWD_BUFFER 1024
 
-int main(void) {
+int main() {
 
 	char prompt[SHELL_BUFFER];
 	Command *command = NULL;

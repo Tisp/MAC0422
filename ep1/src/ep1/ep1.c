@@ -1,6 +1,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include "threadlist.h"
+#include "scheduler.h"
 #include "util.h"
 
 
@@ -18,17 +19,13 @@ int main (int argc, char** argv)
 
 	threadlist_init(THREADS);
 
-	for(int i=0; i<(THREADS*THREAD_MESSAGES)/PARALLEL; i++)
+	for(int i=0; !threadlist_empty(); i++)
 	{
 		printf("start run %d\n", i);
 
-		for(int j=0; j<PARALLEL; j++)
-			threadlist_marktorun((i+j)%THREADS);
-		threadlist_run();
-
-		//RAND_WAIT();
-
-		threadlist_waitall();
+		scheduler_update();
+		threadlist_signalrun();
+		scheduler_wait();
 
 		printf("end run %d\n\n", i);
 	}

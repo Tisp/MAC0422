@@ -1,5 +1,5 @@
-#ifndef THREAD_LIST_H
-#define THREAD_LIST_H
+#ifndef THREADLIST_H
+#define THREADLIST_H
 
 
 #include <unistd.h>
@@ -7,8 +7,8 @@
 #include "util.h"
 
 
-#define THREADS 4
-#define PARALLEL 3
+#define THREADS 6
+#define PARALLEL 2
 #define THREAD_MESSAGES 6
 
 
@@ -26,14 +26,19 @@ struct thread
 };
 
 
-//init, mark-torun, wait
 void threadlist_init (int size);
 
 void threadlist_marktorun (int index);
 
-void threadlist_run (void);
+void threadlist_stop (int index);
 
-void threadlist_waitall (void);
+void threadlist_signalrun ();
 
-void threadlist_destroy (void);
+void threadlist_wait (int index);
+
+void threadlist_waitany ();
+
+void threadlist_destroy ();
+
+bool threadlist_empty ();
 #endif
