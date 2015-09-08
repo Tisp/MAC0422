@@ -71,6 +71,10 @@
 		<Unit filename="src/ep1sh/ep1sh.c">
 			<Option compilerVar="CC" />
 		</Unit>
+		<Unit filename="src/linkedlist.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/linkedlist.h" />
 		<Unit filename="src/util.c">
 			<Option compilerVar="CC" />
 		</Unit>

@@ -7,8 +7,8 @@ void scheduler_update ()
 {
 	static int i = 0;
 
-    threadlist_marktorun(i);
-    threadlist_marktorun(i+1);
+	threadlist_marktorun(i);
+	threadlist_marktorun(i+1);
 
 	i += 2;
 }

@@ -7,8 +7,8 @@ O shell, chamado de ep1sh, a ser desenvolvido, deve permitir a invocação (exec
 * /bin/ls -1
 * ./ep1 \<argumentos do EP1\>
 
-O shell também precisa ter os 2 comandos abaixo embutidos nele, que devem obrigatoriamente ser implementados usando chamadas de sistema do Linux. Esses comandos devem ser executados sempre com os argumentos abaixo e que devem fazer exatamente o que esses 2 comandos fazem no shell bash:
 
+O shell também precisa ter os 2 comandos abaixo embutidos nele, que devem obrigatoriamente ser implementados usando chamadas de sistema do Linux. Esses comandos devem ser executados sempre com os argumentos abaixo e que devem fazer exatamente o que esses 2 comandos fazem no shell bash:
 * cd \<novo diretório para mudar\>
 * pwd
 
@@ -17,7 +17,7 @@ O shell tem que suportar a listagem de comandos que foram executados previamente
 O prompt do shell deve conter o diretório atual entre colchetes seguido de um espaços em branco, como no exemplo abaixo que mostra o shell pronto para rodar o comando cd que mudaráo diretório atual para o /tmp:
 
 	[/home/mac/] cd /tmp 
-     
+
 ### Compilação
 ```sh
 make ep1sh

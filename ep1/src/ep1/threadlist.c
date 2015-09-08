@@ -4,7 +4,6 @@
 #include "threadlist.h"
 
 
-
 thread threadlist[THREADS];
 
 pthread_mutex_t torun_mutex = PTHREAD_MUTEX_INITIALIZER;

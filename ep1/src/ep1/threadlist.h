@@ -20,9 +20,9 @@ typedef struct thread thread;
 
 struct thread
 {
-    pthread_t thread;
-    bool finished;
-    bool torun;
+	pthread_t thread;
+	bool finished;
+	bool torun;
 };
 
 
