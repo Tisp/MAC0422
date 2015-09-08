@@ -19,8 +19,6 @@ static node* start;
 void linkedlist_init ()
 {
 	start = fmalloc(sizeof(node));
-
-	start->data = 'x';
 	start->next = NULL;
 }
 

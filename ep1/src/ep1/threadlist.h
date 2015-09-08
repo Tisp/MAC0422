@@ -12,7 +12,7 @@
 #define THREAD_MESSAGES 6
 
 
-#define RAND_WAIT() usleep(10000+rand()%10000)
+#define RAND_WAIT() usleep(rand()%10000)
 
 
 typedef struct thread thread;
@@ -26,11 +26,11 @@ struct thread
 };
 
 
-void threadlist_init (int size);
+void threadlist_init ();
 
 void threadlist_marktorun (int index);
 
-void threadlist_stop (int index);
+void threadlist_markstop (int index);
 
 void threadlist_signalrun ();
 

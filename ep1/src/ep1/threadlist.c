@@ -2,9 +2,8 @@
 #include <stdlib.h>
 #include <inttypes.h>
 #include "threadlist.h"
+#include "linkedlist.h"
 
-
-thread threadlist[THREADS];
 
 pthread_mutex_t torun_mutex = PTHREAD_MUTEX_INITIALIZER;
 pthread_cond_t torun_cond = PTHREAD_COND_INITIALIZER;
@@ -17,11 +16,12 @@ pthread_cond_t finished_cond = PTHREAD_COND_INITIALIZER;
 static void thread_func (uintptr_t threadnum)
 {
 	int i = 0;
+	thread* curr_thread = linkedlist_get(threadnum);
 
 	while(i < THREAD_MESSAGES)
 	{
 		pthread_mutex_lock(&torun_mutex);
-		while(threadlist[threadnum].torun == false)
+		while(curr_thread->torun == false)
 			pthread_cond_wait(&torun_cond, &torun_mutex);
 		pthread_mutex_unlock(&torun_mutex);
 
@@ -32,22 +32,27 @@ static void thread_func (uintptr_t threadnum)
 	}
 
 	pthread_mutex_lock(&finished_mutex);
-	threadlist[threadnum].finished = true;
+	curr_thread->finished = true;
 	pthread_cond_signal(&finished_cond);
 	pthread_mutex_unlock(&finished_mutex);
 }
 
 
 
-void threadlist_init (int size)
+void threadlist_init ()
 {
 	srand(109283);
+	linkedlist_init();
 
 	for(int i=0; i<THREADS; i++)
 	{
-		threadlist[i].finished = false;
-		threadlist[i].torun = false;
-		pthread_create(&threadlist[i].thread, NULL, (void*(*)(void*))thread_func, (void*)(uintptr_t)i);
+		thread* add = fmalloc(sizeof(thread));
+
+		add->finished = false;
+		add->torun = false;
+		pthread_create(&add->thread, NULL, (void*(*)(void*))thread_func, (void*)(uintptr_t)i);
+
+		linkedlist_add(add);
 	}
 }
 
@@ -56,7 +61,9 @@ void threadlist_init (int size)
 void threadlist_destroy ()
 {
 	for(int i=0; i<THREADS; i++)
-		pthread_join(threadlist[i].thread, NULL);
+		pthread_join(linkedlist_get(i)->thread, NULL);
+
+	linkedlist_destroy();
 }
 
 
@@ -66,7 +73,7 @@ void threadlist_marktorun (int index)
 	pthread_mutex_lock(&torun_mutex);
 	pthread_mutex_lock(&finished_mutex);
 
-	threadlist[index].torun = true;
+	linkedlist_get(index)->torun = true;
 
 	pthread_mutex_unlock(&finished_mutex);
 	pthread_mutex_unlock(&torun_mutex);
@@ -74,12 +81,12 @@ void threadlist_marktorun (int index)
 
 
 
-void threadlist_stop (int index)
+void threadlist_markstop (int index)
 {
 	pthread_mutex_lock(&torun_mutex);
 	pthread_mutex_lock(&finished_mutex);
 
-	threadlist[index].torun = false;
+	linkedlist_get(index)->torun = false;
 
 	pthread_mutex_unlock(&finished_mutex);
 	pthread_mutex_unlock(&torun_mutex);
@@ -100,10 +107,12 @@ void threadlist_wait (int index)
 {
 	pthread_mutex_lock(&finished_mutex);
 
-	while(threadlist[index].finished == false)
+	thread* th = linkedlist_get(index);
+
+	while(th->finished == false)
 		pthread_cond_wait(&finished_cond, &finished_mutex);
 
-	threadlist[index].torun = false;
+	th->torun = false;
 
 	pthread_mutex_unlock(&finished_mutex);
 }
@@ -120,9 +129,11 @@ void threadlist_waitany ()
 		any_finished = false;
 		for(int i=0; i<THREADS; i++)
 		{
-			if(threadlist[i].finished==true && threadlist[i].torun==true)
+			thread* tr = linkedlist_get(i);
+
+			if(tr->finished==true && tr->torun==true)
 			{
-				threadlist[i].torun = false;
+				tr->torun = false;
 				any_finished = true;
 			}
 		}
@@ -143,7 +154,7 @@ bool threadlist_empty ()
 	bool all_finished = true;
 
 	for(int i=0; i<THREADS; i++)
-		all_finished = all_finished && threadlist[i].finished;
+		all_finished = all_finished && linkedlist_get(i)->finished;
 
 	pthread_mutex_unlock(&finished_mutex);
 

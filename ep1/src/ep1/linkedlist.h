@@ -2,7 +2,10 @@
 #define LINKEDLIST_H
 
 
-typedef char linkedlist_data;
+#include "threadlist.h"
+
+
+typedef thread* linkedlist_data;
 
 
 void linkedlist_init ();
