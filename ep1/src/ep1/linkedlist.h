@@ -5,7 +5,7 @@
 #include "threadlist.h"
 
 
-typedef thread* linkedlist_data;
+typedef struct thread* linkedlist_data;
 
 
 void linkedlist_init ();

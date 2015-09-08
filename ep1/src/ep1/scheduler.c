@@ -1,5 +1,5 @@
-#include "threadlist.h"
 #include "scheduler.h"
+#include "threadlist.h"
 
 
 
@@ -20,6 +20,7 @@ void scheduler_wait ()
 	static int i = 0;
 
 	threadlist_wait(i);
+	threadlist_remove(i);
 	threadlist_waitany();
 
 	i += 2;

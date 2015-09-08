@@ -5,6 +5,18 @@
 #include "linkedlist.h"
 
 
+typedef struct thread thread;
+
+
+struct thread
+{
+	pthread_t thread;
+	int id;
+	bool finished;
+	bool torun;
+};
+
+
 pthread_mutex_t torun_mutex = PTHREAD_MUTEX_INITIALIZER;
 pthread_cond_t torun_cond = PTHREAD_COND_INITIALIZER;
 
@@ -13,21 +25,37 @@ pthread_cond_t finished_cond = PTHREAD_COND_INITIALIZER;
 
 
 
-static void thread_func (uintptr_t threadnum)
+static thread* get_thread (int id)
+{
+	thread* th;
+	int i = 0;
+
+	do
+	{
+		th = linkedlist_get(i);
+		i++;
+	} while(th->id != id);
+
+	return th;
+}
+
+
+
+static void thread_func (uintptr_t id)
 {
 	int i = 0;
-	thread* curr_thread = linkedlist_get(threadnum);
+	thread* curr_thread = get_thread((int)id);
 
-	while(i < THREAD_MESSAGES)
+	while(i < 6)
 	{
 		pthread_mutex_lock(&torun_mutex);
 		while(curr_thread->torun == false)
 			pthread_cond_wait(&torun_cond, &torun_mutex);
 		pthread_mutex_unlock(&torun_mutex);
 
-		printf("start thread %" PRIxPTR " msg %d\n", threadnum, i);
+		printf("start thread %d msg %d\n", curr_thread->id, i);
 		RAND_WAIT();
-		printf("end thread %" PRIxPTR " msg %d\n", threadnum, i);
+		printf("end thread %d msg %d\n", curr_thread->id, i);
 		i++;
 	}
 
@@ -43,24 +71,14 @@ void threadlist_init ()
 {
 	srand(109283);
 	linkedlist_init();
-
-	for(int i=0; i<THREADS; i++)
-	{
-		thread* add = fmalloc(sizeof(thread));
-
-		add->finished = false;
-		add->torun = false;
-		pthread_create(&add->thread, NULL, (void*(*)(void*))thread_func, (void*)(uintptr_t)i);
-
-		linkedlist_add(add);
-	}
 }
 
 
 
 void threadlist_destroy ()
 {
-	for(int i=0; i<THREADS; i++)
+	int size = linkedlist_size();
+	for(int i=0; i<size; i++)
 		pthread_join(linkedlist_get(i)->thread, NULL);
 
 	linkedlist_destroy();
@@ -68,12 +86,69 @@ void threadlist_destroy ()
 
 
 
-void threadlist_marktorun (int index)
+int threadlist_create ()
+{
+	static int id = 0;
+	thread* add = fmalloc(sizeof(thread));
+
+	add->id = id;
+	add->finished = false;
+	add->torun = false;
+	pthread_create(&add->thread, NULL, (void*(*)(void*))thread_func, (void*)(uintptr_t)id);
+
+	id++;
+	linkedlist_add(add);
+
+	return id;
+}
+
+
+
+void threadlist_remove (int id)
+{
+	int size = linkedlist_size();
+	for(int i=0; i<size; i++)
+	{
+		thread* th = linkedlist_get(i);
+		if(th->id == id)
+		{
+			pthread_join(th->thread, NULL);
+			linkedlist_delete(i);
+			return;
+		}
+	}
+}
+
+
+
+void threadlist_clear ()
+{
+	pthread_mutex_lock(&finished_mutex);
+
+	int size = linkedlist_size();
+	for(int i=0; i<size; i++)
+	{
+		thread* th = linkedlist_get(i);
+		if(th->finished == true)
+		{
+			pthread_join(th->thread, NULL);
+			linkedlist_delete(i);
+			i--;
+			size--;
+		}
+	}
+
+	pthread_mutex_unlock(&finished_mutex);
+}
+
+
+
+void threadlist_marktorun (int id)
 {
 	pthread_mutex_lock(&torun_mutex);
 	pthread_mutex_lock(&finished_mutex);
 
-	linkedlist_get(index)->torun = true;
+	get_thread(id)->torun = true;
 
 	pthread_mutex_unlock(&finished_mutex);
 	pthread_mutex_unlock(&torun_mutex);
@@ -81,12 +156,12 @@ void threadlist_marktorun (int index)
 
 
 
-void threadlist_markstop (int index)
+void threadlist_markstop (int id)
 {
 	pthread_mutex_lock(&torun_mutex);
 	pthread_mutex_lock(&finished_mutex);
 
-	linkedlist_get(index)->torun = false;
+	get_thread(id)->torun = false;
 
 	pthread_mutex_unlock(&finished_mutex);
 	pthread_mutex_unlock(&torun_mutex);
@@ -103,11 +178,11 @@ void threadlist_signalrun ()
 
 
 
-void threadlist_wait (int index)
+void threadlist_wait (int id)
 {
 	pthread_mutex_lock(&finished_mutex);
 
-	thread* th = linkedlist_get(index);
+	thread* th = get_thread(id);
 
 	while(th->finished == false)
 		pthread_cond_wait(&finished_cond, &finished_mutex);
@@ -123,24 +198,18 @@ void threadlist_waitany ()
 {
 	pthread_mutex_lock(&finished_mutex);
 
-	bool any_finished = false;
-	while(!any_finished)
+	bool any_finished;
+	do
 	{
 		any_finished = false;
-		for(int i=0; i<THREADS; i++)
-		{
-			thread* tr = linkedlist_get(i);
 
-			if(tr->finished==true && tr->torun==true)
-			{
-				tr->torun = false;
-				any_finished = true;
-			}
-		}
+		int size = linkedlist_size();
+		for(int i=0; i<size; i++)
+			any_finished = any_finished || linkedlist_get(i)->finished;
 
 		if(!any_finished)
 			pthread_cond_wait(&finished_cond, &finished_mutex);
-	}
+	} while(!any_finished);
 
 	pthread_mutex_unlock(&finished_mutex);
 }
@@ -149,14 +218,5 @@ void threadlist_waitany ()
 
 bool threadlist_empty ()
 {
-	pthread_mutex_lock(&finished_mutex);
-
-	bool all_finished = true;
-
-	for(int i=0; i<THREADS; i++)
-		all_finished = all_finished && linkedlist_get(i)->finished;
-
-	pthread_mutex_unlock(&finished_mutex);
-
-	return all_finished;
+	return linkedlist_size() == 0;
 }

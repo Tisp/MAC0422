@@ -31,6 +31,9 @@ int main (int argc, char** argv)
 
 	threadlist_init();
 
+	for(int i=0; i<6; i++)
+		threadlist_create();
+
 	for(int i=0; !threadlist_empty(); i++)
 	{
 		printf("start run %d\n", i);
@@ -38,6 +41,7 @@ int main (int argc, char** argv)
 		scheduler_update();
 		threadlist_signalrun();
 		scheduler_wait();
+		threadlist_clear();
 
 		printf("end run %d\n\n", i);
 	}

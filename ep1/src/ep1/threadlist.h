@@ -7,38 +7,28 @@
 #include "util.h"
 
 
-#define THREADS 6
-#define PARALLEL 2
-#define THREAD_MESSAGES 6
-
-
 #define RAND_WAIT() usleep(rand()%10000)
-
-
-typedef struct thread thread;
-
-
-struct thread
-{
-	pthread_t thread;
-	bool finished;
-	bool torun;
-};
 
 
 void threadlist_init ();
 
-void threadlist_marktorun (int index);
+void threadlist_destroy ();
 
-void threadlist_markstop (int index);
+int threadlist_create ();
+
+void threadlist_remove (int id);
+
+void threadlist_clear ();
+
+void threadlist_marktorun (int id);
+
+void threadlist_markstop (int id);
 
 void threadlist_signalrun ();
 
-void threadlist_wait (int index);
+void threadlist_wait (int id);
 
 void threadlist_waitany ();
-
-void threadlist_destroy ();
 
 bool threadlist_empty ();
 #endif
