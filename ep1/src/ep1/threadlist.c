@@ -8,57 +8,47 @@
 typedef struct thread thread;
 
 
+//Dados de cada thread
 struct thread
 {
-	pthread_t thread;
-	int id;
-	bool finished;
-	bool torun;
+	pthread_t thread; //thread em si
+	int id; //id da thread
+	bool finished; //indica se a thread ja terminou
+	bool torun; //indica se a thread deve executar
 };
 
 
+linkedlist threadlist; //lista ligada que guarda as threads
+
+//variaveis de condição (e mutexes associados) que sinalizam quando as threads devem ver se vão executar e quando alguma thread terminou
 pthread_mutex_t torun_mutex = PTHREAD_MUTEX_INITIALIZER;
 pthread_cond_t torun_cond = PTHREAD_COND_INITIALIZER;
-
 pthread_mutex_t finished_mutex = PTHREAD_MUTEX_INITIALIZER;
 pthread_cond_t finished_cond = PTHREAD_COND_INITIALIZER;
 
 
 
-static thread* get_thread (int id)
-{
-	thread* th;
-	int i = 0;
-
-	do
-	{
-		th = linkedlist_get(i);
-		i++;
-	} while(th->id != id);
-
-	return th;
-}
-
-
-
-static void thread_func (uintptr_t id)
+//funcao que verifica se a thread deve ser executada, mede o tempo de execução, executa uma operação dummy para gastar CPU e sinaliza quando a thread terminou
+static void thread_func (thread* curr_thread)
 {
 	int i = 0;
-	thread* curr_thread = get_thread((int)id);
 
-	while(i < 6)
+	while(i < 6) //condicao para a thread terminar, por enquanto só roda algumas iterações
 	{
+		//verifica se essa thread deve executar, caso não espera um sinal para verificar de novo
 		pthread_mutex_lock(&torun_mutex);
 		while(curr_thread->torun == false)
 			pthread_cond_wait(&torun_cond, &torun_mutex);
 		pthread_mutex_unlock(&torun_mutex);
 
+		//executa alguma coisa
 		printf("start thread %d msg %d\n", curr_thread->id, i);
 		RAND_WAIT();
 		printf("end thread %d msg %d\n", curr_thread->id, i);
 		i++;
 	}
 
+	//marca que a thread terminou e sinaliza isso
 	pthread_mutex_lock(&finished_mutex);
 	curr_thread->finished = true;
 	pthread_cond_signal(&finished_cond);
@@ -67,21 +57,43 @@ static void thread_func (uintptr_t id)
 
 
 
+//varre a lista de threads procurando a thread com o ID especificado
+static thread* get_thread (int id)
+{
+	thread* th;
+	int i = 0;
+
+	do
+	{
+		th = (thread*)linkedlist_get(threadlist, i);
+		i++;
+	} while(th->id != id);
+
+	return th;
+}
+
+
+
 void threadlist_init ()
 {
 	srand(109283);
-	linkedlist_init();
+	threadlist = linkedlist_new();
 }
 
 
 
 void threadlist_destroy ()
 {
-	int size = linkedlist_size();
+	int size = linkedlist_size(threadlist);
 	for(int i=0; i<size; i++)
-		pthread_join(linkedlist_get(i)->thread, NULL);
+	{
+		thread* th = (thread*)linkedlist_get(threadlist, 0);
+		pthread_join(th->thread, NULL);
+		free(th);
+		linkedlist_delete(threadlist, 0);
+	}
 
-	linkedlist_destroy();
+	linkedlist_destroy(threadlist);
 }
 
 
@@ -90,15 +102,14 @@ int threadlist_create ()
 {
 	static int id = 0;
 	thread* add = fmalloc(sizeof(thread));
+	linkedlist_add(threadlist, add);
 
 	add->id = id;
 	add->finished = false;
 	add->torun = false;
-	pthread_create(&add->thread, NULL, (void*(*)(void*))thread_func, (void*)(uintptr_t)id);
+	pthread_create(&add->thread, NULL, (void*(*)(void*))thread_func, (void*)add);
 
 	id++;
-	linkedlist_add(add);
-
 	return id;
 }
 
@@ -106,14 +117,15 @@ int threadlist_create ()
 
 void threadlist_remove (int id)
 {
-	int size = linkedlist_size();
+	int size = linkedlist_size(threadlist);
 	for(int i=0; i<size; i++)
 	{
-		thread* th = linkedlist_get(i);
+		thread* th = (thread*)linkedlist_get(threadlist, i);
 		if(th->id == id)
 		{
 			pthread_join(th->thread, NULL);
-			linkedlist_delete(i);
+			free(th);
+			linkedlist_delete(threadlist, i);
 			return;
 		}
 	}
@@ -125,14 +137,15 @@ void threadlist_clear ()
 {
 	pthread_mutex_lock(&finished_mutex);
 
-	int size = linkedlist_size();
+	int size = linkedlist_size(threadlist);
 	for(int i=0; i<size; i++)
 	{
-		thread* th = linkedlist_get(i);
+		thread* th = (thread*)linkedlist_get(threadlist, i);
 		if(th->finished == true)
 		{
 			pthread_join(th->thread, NULL);
-			linkedlist_delete(i);
+			free(th);
+			linkedlist_delete(threadlist, i);
 			i--;
 			size--;
 		}
@@ -146,11 +159,7 @@ void threadlist_clear ()
 void threadlist_marktorun (int id)
 {
 	pthread_mutex_lock(&torun_mutex);
-	pthread_mutex_lock(&finished_mutex);
-
 	get_thread(id)->torun = true;
-
-	pthread_mutex_unlock(&finished_mutex);
 	pthread_mutex_unlock(&torun_mutex);
 }
 
@@ -159,11 +168,7 @@ void threadlist_marktorun (int id)
 void threadlist_markstop (int id)
 {
 	pthread_mutex_lock(&torun_mutex);
-	pthread_mutex_lock(&finished_mutex);
-
 	get_thread(id)->torun = false;
-
-	pthread_mutex_unlock(&finished_mutex);
 	pthread_mutex_unlock(&torun_mutex);
 }
 
@@ -184,6 +189,7 @@ void threadlist_wait (int id)
 
 	thread* th = get_thread(id);
 
+	//se a thread que estamos esperando nao terminou, esperamos alguma terminar e vemos se é a que nos interessa que terminou
 	while(th->finished == false)
 		pthread_cond_wait(&finished_cond, &finished_mutex);
 
@@ -203,9 +209,9 @@ void threadlist_waitany ()
 	{
 		any_finished = false;
 
-		int size = linkedlist_size();
+		int size = linkedlist_size(threadlist);
 		for(int i=0; i<size; i++)
-			any_finished = any_finished || linkedlist_get(i)->finished;
+			any_finished = any_finished || ((thread*)linkedlist_get(threadlist, i))->finished;
 
 		if(!any_finished)
 			pthread_cond_wait(&finished_cond, &finished_mutex);
@@ -218,5 +224,5 @@ void threadlist_waitany ()
 
 bool threadlist_empty ()
 {
-	return linkedlist_size() == 0;
+	return linkedlist_size(threadlist) == 0;
 }

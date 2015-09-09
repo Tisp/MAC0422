@@ -1,3 +1,7 @@
+/*
+	Implementacao simples de lista ligada com cabeça.
+*/
+
 #include "linkedlist.h"
 #include "util.h"
 
@@ -12,22 +16,20 @@ struct node
 };
 
 
-static node* start;
 
-
-
-void linkedlist_init ()
+linkedlist linkedlist_new ()
 {
-	start = fmalloc(sizeof(node));
-	start->next = NULL;
+	linkedlist list = fmalloc(sizeof(node));
+	list->next = NULL;
+	return list;
 }
 
 
 
-void linkedlist_destroy ()
+void linkedlist_destroy (linkedlist list)
 {
-	node* n = start;
-	node* next = start->next;
+	node* n = list;
+	node* next = list->next;
 
 	while(n != NULL)
 	{
@@ -39,14 +41,14 @@ void linkedlist_destroy ()
 
 
 
-void linkedlist_add (linkedlist_data e)
+void linkedlist_add (linkedlist list, linkedlist_data e)
 {
 	node* n = fmalloc(sizeof(node));
 
 	n->data = e;
 	n->next = NULL;
 
-	node* last = start;
+	node* last = list;
 	while(last->next != NULL)
 		last = last->next;
 
@@ -55,10 +57,10 @@ void linkedlist_add (linkedlist_data e)
 
 
 
-void linkedlist_delete (int index)
+void linkedlist_delete (linkedlist list, int index)
 {
-	node* n = start->next;
-	node* prev = start;
+	node* n = list->next;
+	node* prev = list;
 
 	for(int i=0; i<index; i++)
 	{
@@ -72,9 +74,9 @@ void linkedlist_delete (int index)
 
 
 
-linkedlist_data linkedlist_get (int index)
+linkedlist_data linkedlist_get (linkedlist list, int index)
 {
-	node* n = start->next;
+	node* n = list->next;
 
 	for(int i=0; i<index; i++)
 		n = n->next;
@@ -84,9 +86,9 @@ linkedlist_data linkedlist_get (int index)
 
 
 
-int linkedlist_size ()
+int linkedlist_size (linkedlist list)
 {
-	node* n = start;
+	node* n = list;
 
 	int i;
 	for(i=0; n->next!=NULL; i++)

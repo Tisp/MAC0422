@@ -29,23 +29,26 @@ int main (int argc, char** argv)
 	}*/
 
 
+	//cria algumas threads
 	threadlist_init();
 
 	for(int i=0; i<6; i++)
 		threadlist_create();
 
+	//loop principal, roda enquando houverem threads que ainda não terminaram
 	for(int i=0; !threadlist_empty(); i++)
 	{
 		printf("start run %d\n", i);
 
-		scheduler_update();
-		threadlist_signalrun();
-		scheduler_wait();
-		threadlist_clear();
+		scheduler_update(); //atualiza a lista de threads que devem ser executadas de acordo com a lógica do escalonador
+		threadlist_signalrun(); //roda as threads que devem ser executadas
+		scheduler_wait(); //espera algo de acordo com a lógica do escalonador
+		threadlist_clear(); //remove as threads que já terminaram da lista
 
 		printf("end run %d\n\n", i);
 	}
 
+	//destruimos a estrutura para liberar a memoria
 	threadlist_destroy();
 
 
