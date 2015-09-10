@@ -1,45 +1,53 @@
 #include <stdlib.h>
 #include <stdio.h>
+#include <unistd.h>
+#include "util.h"
 #include "threadlist.h"
 #include "linkedlist.h"
 #include "schedulers/test.h"
-#include "util.h"
 
 
+//tamanho máximo do nome de processo
+#define NAME_SIZE 100
+
+
+//estrutura que guarda os dados de cada processo que vai ser criado
 typedef struct input_item input_item;
 
 
 struct input_item
 {
+	char name[NAME_SIZE];
 	int t0;
-	char name[100];
 	int dt;
 };
+
+
+//relogio global de referencia para todo o programa
+timer global_clock;
 
 
 
 int main (int argc, char** argv)
 {
-	//redirecionamento de entrada e saida, trocar os parametros de entrada
-	/*char* argv2[] = {"./"};
-	int argc2 = sizeof(argv2)/sizeof(*argv2);
-	argc = argc2;
-	argv = argv2;*/
-	freopen("./testdata/input0", "r", stdin);
-	//freopen("./testdata/out", "w", stdout);
+	freopen("./testdata/input0", "r", stdin); //redirecionamento de entrada
 
 
-	//inicializa as estruturas e le a entrada para um lista ligada
-	///@todo comentar
+	///@todo processamento da linha de comando (escalonador, aquivos de entrada e saida, flag de debug)
+	//ponteiros para as funcoes reais do escalonador, atualizadas de acordo com o escalonador que vai ser usado
 	void(*scheduler_update)(void) = test_update;
 	void(*scheduler_wait)(void) = test_wait;
-	timer cl;
-	threadlist_init();
-	linkedlist input = linkedlist_new();
-	int t0;
-	char name[100];
-	int dt;
 
+
+	//inicializa as estruturas
+	threadlist_init();
+	linkedlist input = linkedlist_new(); //lista ligada que vai guardar os processos lidos do arquivo de trace
+
+
+	//lemos o arquivo de entrada e adicionamos cada linha a lista ligada criada anteriormente
+	int t0;
+	char name[NAME_SIZE];
+	int dt;
 	while(scanf("%d %s %d %*d %*d\n", &t0, name, &dt) == 3)
 	{
 		input_item* item = fmalloc(sizeof(input_item));
@@ -51,19 +59,18 @@ int main (int argc, char** argv)
 	}
 
 
+	//íniciamos o timer global imediatamente antes de começar a simulaçao
+	global_clock = timer_start();
 
 	//loop principal, roda enquando houverem threads que ainda não terminaram ou processos para chegar
-	cl = timer_start();
-	for(int i=0; !threadlist_empty() || linkedlist_size(input)>0; i++)
+	for(int i=0; !(threadlist_empty() && linkedlist_empty(input)); i++)
 	{
-		//cria os processos que precisar
-		int time = timer_gets(cl);
+		//varre a entrada procurando quais processos devem ser criados
 		int size = linkedlist_size(input);
-
 		for(int i=0; i<size; i++)
 		{
 			input_item* item = linkedlist_get(input, i);
-			if(time >= item->t0)
+			if(timer_gets(global_clock) >= item->t0)
 			{
 				threadlist_create(item->dt);
 				linkedlist_delete(input, i);
@@ -72,18 +79,20 @@ int main (int argc, char** argv)
 			}
 		}
 
-		printf("start run %d at %ds\n", i, time);
-
+		//chama as funções do escalonador
+		///@todo remove printfs
+		printf("start run %d at %ds\n", i, timer_gets(global_clock));
 		scheduler_update(); //atualiza a lista de threads que devem ser executadas de acordo com a lógica do escalonador
 		threadlist_signalrun(); //roda as threads que devem ser executadas
 		scheduler_wait(); //espera algo de acordo com a lógica do escalonador
 		threadlist_clear(); //remove as threads que já terminaram da lista
-
+		usleep(1000*10); //esperamos um pouco antes de rodar outra iteração para não gastar CPU demais
 		printf("end run %d\n\n", i);
 	}
 
 
-	//destruimos a estrutura para liberar a memoria e saimos
+	//destruimos as estruturas para liberar memoria e saimos
+	///@todo verificar se as estruturas estao mesmo vazias
 	threadlist_destroy();
 	linkedlist_destroy(input);
 

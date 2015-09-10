@@ -8,13 +8,11 @@
 #define THREADLIST_H
 
 
-#include <unistd.h>
-#include <pthread.h>
 #include "util.h"
 
 
-///Macro para esperar por um tempo aleatório, útil para forçar que apareçam bugs
-#define RAND_WAIT() usleep(rand()%10000)
+///Clock global definido externamente. Deve ser iniciado antes de chamar qualquer função definida neste arquivo, exceto init
+extern timer global_clock;
 
 
 ///Inicializar a estrutura

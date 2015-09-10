@@ -38,7 +38,7 @@ struct timer
 };
 
 
-///@todo implementar isso, por enquanto usa a stdlib implicitamente mas isso nao existe no C99
+///@todo implementar isso ou ativar POSIX, por enquanto usa a stdlib implicitamente mas isso nao existe no C99 puro
 char* strdup (const char*);
 int usleep (unsigned int);
 

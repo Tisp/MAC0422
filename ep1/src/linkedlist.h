@@ -6,6 +6,9 @@
 #define LINKEDLIST_H
 
 
+#include "util.h"
+
+
 ///Definição do tipo de uma instancia lista ligada
 typedef struct node* linkedlist;
 
@@ -30,4 +33,7 @@ linkedlist_data linkedlist_get (linkedlist list, int index);
 
 ///Retorna o numero de elementos de uma lista ligada
 int linkedlist_size (linkedlist list);
+
+///Retorna true se a lista está vazia e false caso contrário
+bool linkedlist_empty (linkedlist list);
 #endif

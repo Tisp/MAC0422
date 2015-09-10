@@ -96,3 +96,10 @@ int linkedlist_size (linkedlist list)
 
 	return i;
 }
+
+
+
+bool linkedlist_empty (linkedlist list)
+{
+	return linkedlist_size(list) == 0;
+}
