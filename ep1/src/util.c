@@ -63,7 +63,7 @@ void* frealloc (void* p, const size_t tam)
 timer timer_start ()
 {
 	timer ret;
-	ret.start_time = time(NULL);
+	ftime(&ret.start_time);
 	return ret;
 }
 
@@ -71,12 +71,19 @@ timer timer_start ()
 
 int timer_gets (timer cl)
 {
-	return time(NULL) - cl.start_time;
+	struct timeb now;
+	ftime(&now);
+	return now.time - cl.start_time.time;
 }
 
 
 
 long int timer_getms (timer cl)
 {
-	return (time(NULL) - cl.start_time) * 1000;
+	struct timeb now;
+	ftime(&now);
+	long s = cl.start_time.time;
+	long ms = cl.start_time.millitm;
+
+	return (1000*(now.time-s)) + (now.millitm-ms);
 }

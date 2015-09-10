@@ -37,7 +37,7 @@ static pthread_cond_t finished_cond = PTHREAD_COND_INITIALIZER;
 //funcao que verifica se a thread deve ser executada, mede o tempo de execução, executa uma operação dummy para gastar CPU e sinaliza quando a thread terminou. Recebe como parametro a thread correspondente a instancia que está sendo executada
 static void thread_func (thread* th)
 {
-	while(th->runtimems/1000 < th->dt) //continua rodando até dar o tempo
+	while(th->runtimems < th->dt) //continua rodando até dar o tempo
 	{
 		//verifica se essa thread deve executar, caso não espera um sinal para verificar de novo
 		///@todo tirar informacoes extras dos prints
@@ -51,7 +51,7 @@ static void thread_func (thread* th)
 				context_changes++;
 				if(debug)
 				{
-					fprintf(stderr, "%ds: Pausando '%s' [dt=%d] [runtime=%d]\n", timer_gets(global_clock), th->name, th->dt, (int)th->runtimems/1000);
+					fprintf(stderr, "%.1fs: Pausando '%s' [dt=%.f2] [runtime=%.1f]\n", timer_getms(global_clock)/1000.0, th->name, th->dt/1000.0, th->runtimems/1000.0);
 					fprintf(stderr, "Mudancas de contexto: %d\n", context_changes);
 				}
 			}
@@ -64,7 +64,7 @@ static void thread_func (thread* th)
 
 		//executa alguma coisa
 		if(debug && parou)
-			fprintf(stderr, "%ds: Rodando '%s' [dt=%d] [runtime=%d]\n", timer_gets(global_clock), th->name, th->dt, (int)th->runtimems/1000);
+			fprintf(stderr, "%.1fs: Rodando '%s' [dt=%.1f] [runtime=%.1f]\n", timer_getms(global_clock)/1000.0, th->name, th->dt/1000.0, th->runtimems/1000.0);
 		usleep(1000*100); ///@todo gastar cpu de verdade
 
 		th->runtimems += timer_getms(t); //somamamos o tempo dessa iteração ao tempo total
@@ -74,10 +74,10 @@ static void thread_func (thread* th)
 	pthread_mutex_lock(&finished_mutex);
 	if(debug)
 	{
-		fprintf(stderr, "%ds: Terminando '%s' [dt=%d] [runtime=%d]\n", timer_gets(global_clock), th->name, th->dt, (int)th->runtimems/1000);
-		fprintf(stderr, "Linha de saida: %s %d %d\n", th->name, timer_gets(global_clock), (int)th->runtimems/1000);
+		fprintf(stderr, "%.1fs: Terminando '%s' [dt=%.1f] [runtime=%.1f]\n", timer_getms(global_clock)/1000.0, th->name, th->dt/1000.0, th->runtimems/1000.0);
+		fprintf(stderr, "Linha de saida: %s %.1f %.1f\n", th->name, timer_getms(global_clock)/1000.0, th->runtimems/1000.0);
 	}
-	fprintf(out_stream, "%s %d %d\n", th->name, timer_gets(global_clock), (int)th->runtimems/1000);
+	fprintf(out_stream, "%s %.1f %.1f\n", th->name, timer_getms(global_clock)/1000.0, th->runtimems/1000.0);
 	th->finished = true;
 	pthread_cond_signal(&finished_cond);
 	pthread_mutex_unlock(&finished_mutex);

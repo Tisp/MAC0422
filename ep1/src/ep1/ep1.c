@@ -32,23 +32,6 @@ timer global_clock;
 
 int main (int argc, char** argv)
 {
-	/*global_clock = timer_start();
-	printf("%ld\n", timer_getms(global_clock));
-	usleep(1000*1000);
-	printf("%ld\n", timer_getms(global_clock));
-	usleep(1000);
-	printf("%ld\n", timer_getms(global_clock));
-	usleep(1000*100);
-	printf("%ld\n", timer_getms(global_clock));
-	return 1;*/
-
-	///@todo tirar
-	/*char* argv2[] = {"./ep1", "3", "./testdata/input0", "./testdata/output", "d"};
-	int argc2 = sizeof(argv2)/sizeof(*argv2);
-	argc = argc2;
-	argv = argv2;*/
-
-
 	//processamos a linha de comando
 	if(argc!=4 && argc!=5)
 		ERROR("Parametros de linha de comando invalidos");
@@ -108,14 +91,14 @@ int main (int argc, char** argv)
 
 	//lemos o arquivo de entrada e adicionamos cada linha a lista ligada criada anteriormente
 	///@todo entrada de numeros reais
-	int t0;
+	float t0;
 	char name[NAME_SIZE];
-	int dt;
-	while(fscanf(stream_in, "%d %s %d %*d %*d\n", &t0, name, &dt) == 3)
+	float dt;
+	while(fscanf(stream_in, "%f %s %f %*f %*d\n", &t0, name, &dt) == 3)
 	{
 		input_item* item = fmalloc(sizeof(input_item));
-		item->t0 = t0;
-		item->dt = dt;
+		item->t0 = 1000*t0;
+		item->dt = 1000*dt;
 		for(int i=0; i<NAME_SIZE; i++)
 			item->name[i] = name[i];
 		linkedlist_add(input, item);
@@ -129,7 +112,7 @@ int main (int argc, char** argv)
 	for(int i=0; !(threadlist_empty() && linkedlist_empty(input)); i++)
 	{
 		//varre a entrada procurando quais processos devem ser criados
-		int time = timer_gets(global_clock);
+		int time = timer_getms(global_clock);
 		int size = linkedlist_size(input);
 		for(int i=0; i<size; i++)
 		{
@@ -138,7 +121,7 @@ int main (int argc, char** argv)
 			{
 				threadlist_create(item->name, item->dt);
 				if (debug)
-					fprintf(stderr, "%ds: Chegou '%s' [dt=%d]\n", time, item->name, item->dt);
+					fprintf(stderr, "%.1fs: Chegou '%s' [dt=%.1f]\n", time/1000.0, item->name, item->dt/1000.0);
 				free(item);
 				linkedlist_delete(input, i);
 				size--;
