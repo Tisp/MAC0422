@@ -90,7 +90,6 @@ int main (int argc, char** argv)
 
 
 	//lemos o arquivo de entrada e adicionamos cada linha a lista ligada criada anteriormente
-	///@todo entrada de numeros reais
 	float t0;
 	char name[NAME_SIZE];
 	float dt;

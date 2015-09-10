@@ -34,6 +34,18 @@ static pthread_cond_t finished_cond = PTHREAD_COND_INITIALIZER;
 
 
 
+//faz uma conta qualquer para gastar cpu
+static int worker (int iter)
+{
+	iter = iter*1000000;
+	long int a;
+	for(int i=0; i<iter; i++)
+		a += i;
+	return a;
+}
+
+
+
 //funcao que verifica se a thread deve ser executada, mede o tempo de execução, executa uma operação dummy para gastar CPU e sinaliza quando a thread terminou. Recebe como parametro a thread correspondente a instancia que está sendo executada
 static void thread_func (thread* th)
 {
@@ -65,7 +77,7 @@ static void thread_func (thread* th)
 		//executa alguma coisa
 		if(debug && parou)
 			fprintf(stderr, "%.1fs: Rodando '%s' [dt=%.1f] [runtime=%.1f]\n", timer_getms(global_clock)/1000.0, th->name, th->dt/1000.0, th->runtimems/1000.0);
-		usleep(1000*100); ///@todo gastar cpu de verdade
+		worker(10);
 
 		th->runtimems += timer_getms(t); //somamamos o tempo dessa iteração ao tempo total
 	}
