@@ -18,6 +18,9 @@
 ///Clock global definido externamente. Deve ser iniciado antes de chamar qualquer função definida neste arquivo, exceto init
 extern timer global_clock;
 
+///Guarda o numero de mudancas de contexto que ocorreram
+int context_changes;
+
 
 ///Inicializar a estrutura, é necessário informar o numero de cores, uma stream para imprimir a saida e uma flag indicando se é para imprimir menssagens debug.
 void threadlist_init (int ncores, FILE* output, bool dbg);

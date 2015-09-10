@@ -32,11 +32,13 @@ timer global_clock;
 
 int main (int argc, char** argv)
 {
+	fclose(stdout); ///@todo tirar
+
 	///@todo processamento da linha de comando (escalonador, aquivos de entrada e saida, flag de debug)
 	char* filename_out = "./testdata/output";
 	char* filename_in = "./testdata/input0";
-	int scheduler = 3;
-	bool debug = true;
+	int scheduler = 3; ///@todo entrada de numeros reais
+	bool debug = true; ///@todo imprimir mudancas de contexto no arquivo final
 
 
 	//ponteiros para as funcoes reais do escalonador, atualizadas de acordo com o escalonador que vai ser usado
@@ -115,7 +117,7 @@ int main (int argc, char** argv)
 			{
 				threadlist_create(item->name, item->dt);
 				if (debug)
-					fprintf(stderr, "%ds: Chegou thread '%s' [dt=%d]\n", time, item->name, item->dt);
+					fprintf(stderr, "%ds: Chegou '%s' [dt=%d]\n", time, item->name, item->dt);
 				free(item);
 				linkedlist_delete(input, i);
 				size--;

@@ -24,7 +24,7 @@ struct thread
 static linkedlist threadlist; //lista ligada que guarda as threads
 static int cores; //numero de cores simulados
 static FILE* out_stream; //stream onde vai ser impressa a saida
-static bool debug;
+static bool debug; //flag que indica se as menssagens de debug devem ser impressas
 
 //variaveis de condição (e mutexes associados) que sinalizam quando as threads devem ver se vão executar e quando alguma thread terminou
 static pthread_mutex_t torun_mutex = PTHREAD_MUTEX_INITIALIZER;
@@ -40,12 +40,23 @@ static void thread_func (thread* th)
 	while(th->runtimems/1000 < th->dt) //continua rodando até dar o tempo
 	{
 		//verifica se essa thread deve executar, caso não espera um sinal para verificar de novo
+		///@todo tirar informacoes extras dos prints
 		pthread_mutex_lock(&torun_mutex);
 		bool parou = false;
-		while(th->torun == false)
+		if(th->torun == false)
 		{
 			parou = true;
-			pthread_cond_wait(&torun_cond, &torun_mutex);
+			if(th->runtimems>0)
+			{
+				context_changes++;
+				if(debug)
+				{
+					fprintf(stderr, "%ds: Pausando '%s' [dt=%d] [runtime=%d]\n", timer_gets(global_clock), th->name, th->dt, (int)th->runtimems/1000);
+					fprintf(stderr, "Mudancas de contexto: %d\n", context_changes);
+				}
+			}
+			while(th->torun == false)
+				pthread_cond_wait(&torun_cond, &torun_mutex);
 		}
 		pthread_mutex_unlock(&torun_mutex);
 
@@ -53,7 +64,7 @@ static void thread_func (thread* th)
 
 		//executa alguma coisa
 		if(debug && parou)
-			fprintf(stderr, "%ds: Rodando thread '%s' [dt=%d] [runtime=%d]\n", timer_gets(global_clock), th->name, th->dt, (int)th->runtimems/1000);
+			fprintf(stderr, "%ds: Rodando '%s' [dt=%d] [runtime=%d]\n", timer_gets(global_clock), th->name, th->dt, (int)th->runtimems/1000);
 		usleep(1000*100); ///@todo gastar cpu de verdade
 
 		th->runtimems += timer_getms(t); //somamamos o tempo dessa iteração ao tempo total
@@ -61,7 +72,12 @@ static void thread_func (thread* th)
 
 	//marca que a thread terminou e sinaliza isso
 	pthread_mutex_lock(&finished_mutex);
-	printf("end thread %d at %ds\n", th->id, timer_gets(global_clock)); ///@todo remover
+	if(debug)
+	{
+		fprintf(stderr, "%ds: Terminando '%s' [dt=%d] [runtime=%d]\n", timer_gets(global_clock), th->name, th->dt, (int)th->runtimems/1000);
+		///@todo descomentar
+		//fprintf(stderr, "Linha de saida: %s %d %d\n", th->name, timer_gets(global_clock), (int)th->runtimems/1000);
+	}
 	fprintf(out_stream, "%s %d %d\n", th->name, timer_gets(global_clock), (int)th->runtimems/1000);
 	///@todo gravar no struct qual o tempo que terminou a thread de acordo com o relógio global
 	th->finished = true;
@@ -106,12 +122,15 @@ void threadlist_init (int ncores, FILE* output, bool dbg)
 	cores = ncores;
 	out_stream = output;
 	debug = dbg;
+	context_changes = 0;
 }
 
 
 
 void threadlist_destroy ()
 {
+	//guardamos o numero de trocas de contexto
+	fprintf(out_stream, "%d\n", context_changes);
 	//excluimos todas as threads que restam na lista e depois destruimos a lista em sí
 	int size = linkedlist_size(threadlist);
 	for(int i=0; i<size; i++)
