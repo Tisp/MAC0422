@@ -47,6 +47,12 @@ void threadlist_wait (int id);
 ///Espera que uma thread qualquer termine
 void threadlist_waitany ();
 
+///Retorna o ID da index-ésima thread. É garantido que as threads estão ordenadas do menor para o maior ID
+int threadlist_getid (int index);
+
+///Retorna o número de threads na estrutura
+int threadlist_size ();
+
 ///Retorna false se não há nenhuma thread na estrutura e true caso contrário
 bool threadlist_empty ();
 #endif

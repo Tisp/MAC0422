@@ -20,7 +20,7 @@ struct thread
 };
 
 
-linkedlist threadlist; ///@todo static //lista ligada que guarda as threads
+static linkedlist threadlist; //lista ligada que guarda as threads
 
 //variaveis de condição (e mutexes associados) que sinalizam quando as threads devem ver se vão executar e quando alguma thread terminou
 static pthread_mutex_t torun_mutex = PTHREAD_MUTEX_INITIALIZER;
@@ -71,6 +71,7 @@ static thread* get_thread (int id)
 
 	do
 	{
+		///@todo verificar se ja passou ou chegou no fim
 		th = (thread*)linkedlist_get(threadlist, i);
 		i++;
 	} while(th->id != id);
@@ -225,6 +226,20 @@ void threadlist_waitany ()
 	} while(!any_finished);
 
 	pthread_mutex_unlock(&finished_mutex);
+}
+
+
+
+int threadlist_getid (int index)
+{
+	return ((thread*)linkedlist_get(threadlist, index))->id;
+}
+
+
+
+int threadlist_size ()
+{
+	return linkedlist_size(threadlist);
 }
 
 

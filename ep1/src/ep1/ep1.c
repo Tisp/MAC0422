@@ -2,7 +2,7 @@
 #include <stdio.h>
 #include "threadlist.h"
 #include "linkedlist.h"
-#include "scheduler.h"
+#include "schedulers/test.h"
 #include "util.h"
 
 
@@ -30,6 +30,9 @@ int main (int argc, char** argv)
 
 
 	//inicializa as estruturas e le a entrada para um lista ligada
+	///@todo comentar
+	void(*scheduler_update)(void) = test_update;
+	void(*scheduler_wait)(void) = test_wait;
 	timer cl;
 	threadlist_init();
 	linkedlist input = linkedlist_new();

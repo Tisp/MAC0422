@@ -1,5 +1,5 @@
 BIN_EP1 = ep1
-SRCS_EP1 = $(wildcard src/ep1/*.c) $(wildcard src/*.c)
+SRCS_EP1 = $(wildcard src/ep1/*.c) $(wildcard src/ep1/schedulers/*.c) $(wildcard src/*.c)
 BIN_EP1SH = ep1sh
 SRCS_EP1SH = $(wildcard src/ep1sh/*.c) $(wildcard src/*.c)
 
