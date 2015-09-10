@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdarg.h>
+#include <time.h>
 #include "util.h"
 
 
@@ -56,3 +57,25 @@ void* frealloc (void* p, const size_t tam)
 	return ret;
 }
 
+
+
+timer timer_start ()
+{
+	timer ret;
+	ret.start_time = time(NULL);
+	return ret;
+}
+
+
+
+int timer_gets (timer cl)
+{
+	return time(NULL) - cl.start_time;
+}
+
+
+
+long int timer_getms (timer cl)
+{
+	return (time(NULL) - cl.start_time) * 1000;
+}

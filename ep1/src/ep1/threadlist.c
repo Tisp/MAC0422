@@ -18,13 +18,14 @@ struct thread
 };
 
 
+///@todo static
 linkedlist threadlist; //lista ligada que guarda as threads
 
 //variaveis de condição (e mutexes associados) que sinalizam quando as threads devem ver se vão executar e quando alguma thread terminou
-pthread_mutex_t torun_mutex = PTHREAD_MUTEX_INITIALIZER;
-pthread_cond_t torun_cond = PTHREAD_COND_INITIALIZER;
-pthread_mutex_t finished_mutex = PTHREAD_MUTEX_INITIALIZER;
-pthread_cond_t finished_cond = PTHREAD_COND_INITIALIZER;
+static pthread_mutex_t torun_mutex = PTHREAD_MUTEX_INITIALIZER;
+static pthread_cond_t torun_cond = PTHREAD_COND_INITIALIZER;
+static pthread_mutex_t finished_mutex = PTHREAD_MUTEX_INITIALIZER;
+static pthread_cond_t finished_cond = PTHREAD_COND_INITIALIZER;
 
 
 
