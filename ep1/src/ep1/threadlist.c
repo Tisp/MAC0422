@@ -75,11 +75,9 @@ static void thread_func (thread* th)
 	if(debug)
 	{
 		fprintf(stderr, "%ds: Terminando '%s' [dt=%d] [runtime=%d]\n", timer_gets(global_clock), th->name, th->dt, (int)th->runtimems/1000);
-		///@todo descomentar
-		//fprintf(stderr, "Linha de saida: %s %d %d\n", th->name, timer_gets(global_clock), (int)th->runtimems/1000);
+		fprintf(stderr, "Linha de saida: %s %d %d\n", th->name, timer_gets(global_clock), (int)th->runtimems/1000);
 	}
 	fprintf(out_stream, "%s %d %d\n", th->name, timer_gets(global_clock), (int)th->runtimems/1000);
-	///@todo gravar no struct qual o tempo que terminou a thread de acordo com o relógio global
 	th->finished = true;
 	pthread_cond_signal(&finished_cond);
 	pthread_mutex_unlock(&finished_mutex);
@@ -95,7 +93,6 @@ static thread* get_thread (int id)
 
 	do
 	{
-		///@todo verificar se ja passou ou chegou no fim
 		th = (thread*)linkedlist_get(threadlist, i);
 		i++;
 	} while(th->id != id);
@@ -216,7 +213,6 @@ int threadlist_clear ()
 void threadlist_marktorun (int id)
 {
 	//simplesmente mudamos a flag dela, quando sinalizarmos ela vai rodar
-	///@todo verificar se o numero de cores é respeitado sempre que for colocar uma thread pra rodar
 	get_thread(id)->torun = true;
 }
 
@@ -242,6 +238,7 @@ void threadlist_signalrun ()
 
 void threadlist_wait (int id)
 {
+	///@todo remover?
 	pthread_mutex_lock(&finished_mutex);
 
 	thread* th = get_thread(id);
@@ -259,7 +256,7 @@ void threadlist_wait (int id)
 
 void threadlist_waitany ()
 {
-	///@todo comentar
+	///@todo remover?
 	pthread_mutex_lock(&finished_mutex);
 
 	bool any_finished;

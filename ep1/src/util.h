@@ -10,6 +10,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>
+#include <sys/time.h> ///@todo ver se isso esta ok
 
 
 #define NAN ((0.0)/(double)(0.0))

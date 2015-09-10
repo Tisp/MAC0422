@@ -32,13 +32,33 @@ timer global_clock;
 
 int main (int argc, char** argv)
 {
-	fclose(stdout); ///@todo tirar
+	/*global_clock = timer_start();
+	printf("%ld\n", timer_getms(global_clock));
+	usleep(1000*1000);
+	printf("%ld\n", timer_getms(global_clock));
+	usleep(1000);
+	printf("%ld\n", timer_getms(global_clock));
+	usleep(1000*100);
+	printf("%ld\n", timer_getms(global_clock));
+	return 1;*/
 
-	///@todo processamento da linha de comando (escalonador, aquivos de entrada e saida, flag de debug)
-	char* filename_out = "./testdata/output";
-	char* filename_in = "./testdata/input0";
-	int scheduler = 3; ///@todo entrada de numeros reais
-	bool debug = true; ///@todo imprimir mudancas de contexto no arquivo final
+	///@todo tirar
+	/*char* argv2[] = {"./ep1", "3", "./testdata/input0", "./testdata/output", "d"};
+	int argc2 = sizeof(argv2)/sizeof(*argv2);
+	argc = argc2;
+	argv = argv2;*/
+
+
+	//processamos a linha de comando
+	if(argc!=4 && argc!=5)
+		ERROR("Parametros de linha de comando invalidos");
+	char* filename_in = argv[2];
+	char* filename_out = argv[3];
+	int scheduler = atoi(argv[1]);
+	bool debug = false;
+	if(argc == 5)
+		if(argv[4][0] == 'd')
+			debug = true;
 
 
 	//ponteiros para as funcoes reais do escalonador, atualizadas de acordo com o escalonador que vai ser usado
@@ -63,6 +83,7 @@ int main (int argc, char** argv)
 			break;
 
 		case 4:
+			///@todo colocar default se não implementar
 			break;
 
 		case 5:
@@ -78,7 +99,6 @@ int main (int argc, char** argv)
 	}
 
 
-
 	//inicializa as estruturas
 	FILE* stream_out = fopen(filename_out, "w");
 	FILE* stream_in = fopen(filename_in, "r");
@@ -87,6 +107,7 @@ int main (int argc, char** argv)
 
 
 	//lemos o arquivo de entrada e adicionamos cada linha a lista ligada criada anteriormente
+	///@todo entrada de numeros reais
 	int t0;
 	char name[NAME_SIZE];
 	int dt;
@@ -136,7 +157,6 @@ int main (int argc, char** argv)
 
 
 	//destruimos as estruturas para liberar memoria e saimos
-	///@todo verificar se as estruturas estao mesmo vazias
 	threadlist_destroy();
 	linkedlist_destroy(input);
 	fclose(stream_out);
