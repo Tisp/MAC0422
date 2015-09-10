@@ -23,8 +23,8 @@ void threadlist_init ();
 ///Destroi a estrutura e as threads que estão contidas nela
 void threadlist_destroy ();
 
-///Cria uma nova thread e retorna seu ID
-int threadlist_create ();
+///Cria uma nova thread com os parametros fornecidos e retorna seu ID
+int threadlist_create (int dt);
 
 ///Remove uma thread que já tenha terminado
 void threadlist_remove (int id);

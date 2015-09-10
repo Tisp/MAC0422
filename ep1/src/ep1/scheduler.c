@@ -28,7 +28,7 @@ void scheduler_wait ()
 
 	if(linkedlist_size(threadlist) < 2)
 	{
-		usleep(1000*1000*0.2);
+		usleep(1000*1000*0.5);
 		return;
 	}
 

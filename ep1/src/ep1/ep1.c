@@ -62,7 +62,7 @@ int main (int argc, char** argv)
 			input_item* item = linkedlist_get(input, i);
 			if(time >= item->t0)
 			{
-				threadlist_create();
+				threadlist_create(item->dt);
 				linkedlist_delete(input, i);
 				size--;
 				i--;

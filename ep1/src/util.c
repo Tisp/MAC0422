@@ -59,6 +59,7 @@ void* frealloc (void* p, const size_t tam)
 
 
 
+///@todo timer com milisegundos
 timer timer_start ()
 {
 	timer ret;
