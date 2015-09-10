@@ -54,6 +54,9 @@ int threadlist_getid_stopped (int index);*/
 ///Returna true se a thread esta marcada para rodar e false caso contrario
 bool threadlist_running (int id);
 
+///Returna o tempo total que a thread deve executar
+int threadlist_dt (int id);
+
 ///Retorna o número de threads na estrutura
 int threadlist_size ();
 

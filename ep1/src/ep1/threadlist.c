@@ -134,7 +134,7 @@ int threadlist_create (int dt)
 	pthread_create(&add->thread, NULL, (void*(*)(void*))thread_func, (void*)add);
 
 	id++;
-	return id;
+	return id-1;
 }
 
 
@@ -284,6 +284,13 @@ int threadlist_getid (int index)
 bool threadlist_running (int id)
 {
 	return get_thread(id)->torun;
+}
+
+
+
+int threadlist_dt (int id)
+{
+	return get_thread(id)->dt;
 }
 
 

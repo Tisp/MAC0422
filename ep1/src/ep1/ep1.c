@@ -4,8 +4,8 @@
 #include "util.h"
 #include "threadlist.h"
 #include "linkedlist.h"
-#include "schedulers/test.h" ///@todo remover e deletar o arquivo
 #include "schedulers/fcfs.h"
+#include "schedulers/sjf.h"
 
 
 //tamanho máximo do nome de processo
@@ -40,10 +40,8 @@ int main (int argc, char** argv)
 
 	///@todo processamento da linha de comando (escalonador, aquivos de entrada e saida, flag de debug)
 	//ponteiros para as funcoes reais do escalonador, atualizadas de acordo com o escalonador que vai ser usado
-	void(*scheduler_update)(void) = fcfs_update;
-	void(*scheduler_wait)(void) = fcfs_wait;
-	/*void(*scheduler_update)(void) = test_update;
-	void(*scheduler_wait)(void) = test_wait;*/
+	void(*scheduler_update)(void) = sjf_update;
+	void(*scheduler_wait)(void) = sjf_wait;
 
 
 	//inicializa as estruturas
@@ -80,7 +78,8 @@ int main (int argc, char** argv)
 			input_item* item = linkedlist_get(input, i);
 			if(time >= item->t0)
 			{
-				threadlist_create(item->dt);
+				int id = threadlist_create(item->dt);
+				printf("chegou thread %d [dt=%d] at %ds\n", id, item->dt, time); ///@todo remover
 				free(item);
 				linkedlist_delete(input, i);
 				size--;

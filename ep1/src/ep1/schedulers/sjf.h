@@ -3,11 +3,11 @@
     O funcionamento de ambas dessas funções depende de qual escalonador está sendo implementado.
 */
 
-#ifndef TEST_H
-#define TEST_H
+#ifndef SJF_H
+#define SJF_H
 
 
-void test_update ();
+void sjf_update ();
 
-void test_wait ();
+void sjf_wait ();
 #endif
