@@ -29,7 +29,7 @@ void threadlist_init (int ncores, FILE* output, bool dbg);
 void threadlist_destroy ();
 
 ///Cria uma nova thread com os parametros fornecidos e retorna seu ID
-int threadlist_create (char* name, int dt);
+int threadlist_create (char* name, int dt, int deadline);
 
 ///Remove uma thread que já tenha terminado
 void threadlist_remove (int id);
@@ -61,9 +61,6 @@ void threadlist_unlockall ();
 ///Retorna o ID da index-ésima thread. É garantido que as threads estão ordenadas do menor para o maior ID
 int threadlist_getid (int index);
 
-/*Retorna o ID da index-ésima thread que não está rodando. É garantido que as threads estão ordenadas do menor para o maior ID
-int threadlist_getid_stopped (int index);*/
-
 ///Returna true se a thread esta marcada para rodar e false caso contrario
 bool threadlist_running (int id);
 
@@ -81,4 +78,7 @@ bool threadlist_empty ();
 
 ///Retorna o numero de cores sendo simulados
 int threadlist_ncores ();
+
+///Retorna o deadline da thread
+int threadlist_get_deadline (int id);
 #endif

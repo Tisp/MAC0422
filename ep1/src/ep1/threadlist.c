@@ -18,6 +18,7 @@ struct thread
 	bool torun; //indica se a thread deve executar
 	int dt; //tempo total que a thread deve executar
 	long int runtimems; //tempo que a thread ja rodou em ms
+	long deadline;
 };
 
 
@@ -52,7 +53,6 @@ static void thread_func (thread* th)
 	while(th->runtimems < th->dt) //continua rodando até dar o tempo
 	{
 		//verifica se essa thread deve executar, caso não espera um sinal para verificar de novo
-		///@todo tirar informacoes extras dos prints
 		pthread_mutex_lock(&torun_mutex);
 		bool parou = false;
 		if(th->torun == false)
@@ -63,7 +63,7 @@ static void thread_func (thread* th)
 				context_changes++;
 				if(debug)
 				{
-					fprintf(stderr, "%.1fs: Pausando '%s' [dt=%.1f] [runtime=%.1f]\n", timer_getms(global_clock)/1000.0, th->name, th->dt/1000.0, th->runtimems/1000.0);
+					fprintf(stderr, "%.1fs: Pausando '%s'\n", timer_getms(global_clock)/1000.0, th->name);
 					fprintf(stderr, "Mudancas de contexto: %d\n", context_changes);
 				}
 			}
@@ -76,7 +76,7 @@ static void thread_func (thread* th)
 
 		//executa alguma coisa
 		if(debug && parou)
-			fprintf(stderr, "%.1fs: Rodando '%s' [dt=%.1f] [runtime=%.1f]\n", timer_getms(global_clock)/1000.0, th->name, th->dt/1000.0, th->runtimems/1000.0);
+			fprintf(stderr, "%.1fs: Rodando '%s'\n", timer_getms(global_clock)/1000.0, th->name);
 		worker(10);
 
 		th->runtimems += timer_getms(t); //somamamos o tempo dessa iteração ao tempo total
@@ -86,7 +86,7 @@ static void thread_func (thread* th)
 	pthread_mutex_lock(&finished_mutex);
 	if(debug)
 	{
-		fprintf(stderr, "%.1fs: Terminando '%s' [dt=%.1f] [runtime=%.1f]\n", timer_getms(global_clock)/1000.0, th->name, th->dt/1000.0, th->runtimems/1000.0);
+		fprintf(stderr, "%.1fs: Terminando '%s'\n", timer_getms(global_clock)/1000.0, th->name);
 		fprintf(stderr, "Linha de saida: %s %.1f %.1f\n", th->name, timer_getms(global_clock)/1000.0, th->runtimems/1000.0);
 	}
 	fprintf(out_stream, "%s %.1f %.1f\n", th->name, timer_getms(global_clock)/1000.0, th->runtimems/1000.0);
@@ -155,7 +155,7 @@ void threadlist_destroy ()
 
 
 
-int threadlist_create (char* name, int dt)
+int threadlist_create (char* name, int dt, int deadline)
 {
 	//simplesmente alocamos uma nova thread, copiamos os parametros, iniciamos ela e a adicionamos na lista ligada
 	static int id = 0; //jeito simples de lembrar qual foi o ultimo ID usado
@@ -167,6 +167,7 @@ int threadlist_create (char* name, int dt)
 	add->torun = false;
 	add->dt = dt;
 	add->runtimems = 0;
+	add->deadline = deadline;
 	for(int i=0; i<NAME_SIZE; i++)
 		add->name[i] = name[i];
 	pthread_create(&add->thread, NULL, (void*(*)(void*))thread_func, (void*)add);
@@ -248,70 +249,10 @@ void threadlist_signalrun ()
 
 
 
-void threadlist_wait (int id)
-{
-	///@todo remover?
-	pthread_mutex_lock(&finished_mutex);
-
-	thread* th = get_thread(id);
-
-	//se a thread que estamos esperando nao terminou, esperamos alguma terminar e vemos se é a que nos interessa que terminou
-	while(th->finished == false)
-		pthread_cond_wait(&finished_cond, &finished_mutex);
-
-	th->torun = false;
-
-	pthread_mutex_unlock(&finished_mutex);
-}
-
-
-
-void threadlist_waitany ()
-{
-	///@todo remover?
-	pthread_mutex_lock(&finished_mutex);
-
-	bool any_finished;
-	do
-	{
-		any_finished = false;
-
-		int size = linkedlist_size(threadlist);
-		for(int i=0; i<size; i++)
-			any_finished = any_finished || ((thread*)linkedlist_get(threadlist, i))->finished;
-
-		if(!any_finished)
-			pthread_cond_wait(&finished_cond, &finished_mutex);
-	} while(!any_finished);
-
-	pthread_mutex_unlock(&finished_mutex);
-}
-
-
-
 int threadlist_getid (int index)
 {
 	return ((thread*)linkedlist_get(threadlist, index))->id;
 }
-
-
-
-/*int threadlist_getid_stopped (int index)
-{
-	ATENCAO, IMPLEMENTACAO MUITO PROVAVELMENTE BUGADA
-	@todo comentar e adicionar vierificacoes
-	int curr = -1;
-	thread* th;
-	int size = linkedlist_size(threadlist);
-	for(int i=0; i<size && curr!=index; i++)
-	{
-		th = (thread*)linkedlist_get(threadlist, i);
-		if(th->torun==false && th->finished==false)
-			curr++;
-	}
-
-	return th->id;
-}*/
 
 
 
@@ -369,4 +310,11 @@ void threadlist_unlockall ()
 {
 	pthread_mutex_unlock(&torun_mutex);
 	pthread_mutex_unlock(&finished_mutex);
+}
+
+
+
+int threadlist_get_deadline (int id)
+{
+	return get_thread(id)->deadline;
 }

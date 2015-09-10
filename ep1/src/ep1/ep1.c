@@ -15,6 +15,7 @@
 #include "schedulers/sjf.h"
 #include "schedulers/srtn.h"
 #include "schedulers/roundrobin.h"
+#include "schedulers/realtime.h"
 
 
 //estrutura que guarda os dados de cada processo que vai ser criado
@@ -26,6 +27,8 @@ struct input_item
 	char name[NAME_SIZE];
 	int t0;
 	int dt;
+	int deadline;
+	int priority;
 };
 
 
@@ -36,13 +39,6 @@ timer global_clock;
 
 int main (int argc, char** argv)
 {
-	///@todo tirar
-	char* argv2[] = {"./ep1", "4", "./testdata/input0", "./testdata/output", "d"};
-	int argc2 = sizeof(argv2)/sizeof(*argv2);
-	argc = argc2;
-	argv = argv2;
-
-
 	//processamos a linha de comando
 	if(argc!=4 && argc!=5)
 		ERROR("Parametros de linha de comando invalidos");
@@ -79,13 +75,11 @@ int main (int argc, char** argv)
 		case 4:
 			scheduler_update = roundrobin_update;
 			scheduler_wait = roundrobin_wait;
-			///@todo colocar default se não implementar
-			break;
-
-		case 5:
 			break;
 
 		case 6:
+			scheduler_update = realtime_update;
+			scheduler_wait = realtime_wait;
 			break;
 
 		default:
@@ -107,11 +101,15 @@ int main (int argc, char** argv)
 	float t0;
 	char name[NAME_SIZE];
 	float dt;
-	while(fscanf(stream_in, "%f %s %f %*f %*d\n", &t0, name, &dt) == 3)
+	float deadline;
+	int priority;
+	while(fscanf(stream_in, "%f %s %f %f %d\n", &t0, name, &dt, &deadline, &priority) == 5)
 	{
 		input_item* item = fmalloc(sizeof(input_item));
 		item->t0 = 1000*t0;
 		item->dt = 1000*dt;
+		item->deadline = 1000*deadline;
+		item->priority = priority;
 		for(int i=0; i<NAME_SIZE; i++)
 			item->name[i] = name[i];
 		linkedlist_add(input, item);
@@ -132,9 +130,9 @@ int main (int argc, char** argv)
 			input_item* item = linkedlist_get(input, i);
 			if(time >= item->t0)
 			{
-				threadlist_create(item->name, item->dt);
+				threadlist_create(item->name, item->dt, item->deadline);
 				if (debug)
-					fprintf(stderr, "%.1fs: Chegou '%s' [dt=%.1f]\n", time/1000.0, item->name, item->dt/1000.0);
+					fprintf(stderr, "%.1fs: Chegou '%s' [t0=%.1f dt=%.1f deadline=%.1f priority=%d]\n", time/1000.0, item->name, time/1000.0, item->dt/1000.0, item->deadline/1000.0, item->priority);
 				free(item);
 				linkedlist_delete(input, i);
 				size--;
