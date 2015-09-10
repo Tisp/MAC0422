@@ -1,3 +1,10 @@
+#if __STDC_VERSION__ >= 199901L
+#define _XOPEN_SOURCE 600
+#else
+#define _XOPEN_SOURCE 500
+#endif
+
+
 #include <stdlib.h>
 #include <stdio.h>
 #include <unistd.h>
@@ -7,10 +14,6 @@
 #include "schedulers/fcfs.h"
 #include "schedulers/sjf.h"
 #include "schedulers/srtn.h"
-
-
-///@todo pegar isso do sistema
-#define CORES 2
 
 
 //estrutura que guarda os dados de cada processo que vai ser criado
@@ -85,7 +88,7 @@ int main (int argc, char** argv)
 	//inicializa as estruturas
 	FILE* stream_out = fopen(filename_out, "w");
 	FILE* stream_in = fopen(filename_in, "r");
-	threadlist_init(CORES, stream_out, debug);
+	threadlist_init(sysconf(_SC_NPROCESSORS_CONF), stream_out, debug);
 	linkedlist input = linkedlist_new(); //lista ligada que vai guardar os processos lidos do arquivo de trace
 
 

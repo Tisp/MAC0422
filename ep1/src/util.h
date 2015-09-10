@@ -6,11 +6,20 @@
 #define UTIL_H
 
 
+#if __STDC_VERSION__ >= 199901L
+#define _XOPEN_SOURCE 600
+#else
+#define _XOPEN_SOURCE 500
+#endif
+
+
+
 #include <stddef.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>
-#include <sys/timeb.h> ///@todo ver se isso esta ok
+#include <unistd.h>
+#include <sys/timeb.h>
 
 
 #define NAN ((0.0)/(double)(0.0))
@@ -38,10 +47,6 @@ struct timer
 	struct timeb start_time;
 };
 
-
-///@todo implementar isso ou ativar POSIX, por enquanto usa a stdlib implicitamente mas isso nao existe no C99 puro
-char* strdup (const char*);
-int usleep (unsigned int);
 
 ///Imprime o arquivo, linha, função e a mensagem de erro msg (mesmo formato do printf) e chama exit(EXIT_FAILURE)
 void error (const char* const restrict file, const char* const restrict func, int line, const char* const msg, ...);
