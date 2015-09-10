@@ -30,10 +30,10 @@ void threadlist_remove (int id);
 ///Remove todas as threads que já terminaram e retorna quantas foram removidas
 int threadlist_clear ();
 
-///Marca uma thread para execução quando a função threalist_signalrun for chamadda
+///Marca uma thread para execução quando a função threalist_signalrun for chamada. As threads devem estar travadas antes dessa função ser chamada.
 void threadlist_marktorun (int id);
 
-///Sinaliza a uma thread que ela deve parar assim que possível
+///Sinaliza a uma thread que ela deve parar assim que possível. As threads devem estar travadas antes dessa função ser chamada.
 void threadlist_markstop (int id);
 
 ///Continua a execução de todas as threads marcadas com threadlist_marktorun
@@ -45,6 +45,12 @@ void threadlist_wait (int id);
 ///Espera que uma thread qualquer termine
 void threadlist_waitany ();
 
+///Trava todas as threads
+void threadlist_lockall ();
+
+///Destrava todas as threas
+void threadlist_unlockall ();
+
 ///Retorna o ID da index-ésima thread. É garantido que as threads estão ordenadas do menor para o maior ID
 int threadlist_getid (int index);
 
@@ -54,8 +60,11 @@ int threadlist_getid_stopped (int index);*/
 ///Returna true se a thread esta marcada para rodar e false caso contrario
 bool threadlist_running (int id);
 
-///Returna o tempo total que a thread deve executar
-int threadlist_dt (int id);
+///Returna o tempo total que a thread deve executar em segundos
+int threadlist_get_dt (int id);
+
+///Returna o tempo que falta para a thread terminar em ms
+int threadlist_get_remainingms (int id);
 
 ///Retorna o número de threads na estrutura
 int threadlist_size ();

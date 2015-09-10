@@ -60,10 +60,14 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="src/ep1/schedulers/fcfs.h" />
-		<Unit filename="src/ep1/schedulers/test.c">
+		<Unit filename="src/ep1/schedulers/sjf.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="src/ep1/schedulers/test.h" />
+		<Unit filename="src/ep1/schedulers/sjf.h" />
+		<Unit filename="src/ep1/schedulers/srtn.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/ep1/schedulers/srtn.h" />
 		<Unit filename="src/ep1/threadlist.c">
 			<Option compilerVar="CC" />
 		</Unit>

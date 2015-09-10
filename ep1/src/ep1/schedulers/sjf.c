@@ -9,9 +9,6 @@ static int occupied = 0;
 
 void sjf_update ()
 {
-	//atualizamos o numero de cores livres
-	occupied -= threadlist_clear();
-
 	//colocamos o menor thread para todar até encher todos os cores disponiveis ou não terem mais threads
 	int size = threadlist_size();
 	for(int i=0; i<size && occupied<threadlist_ncores(); i++)
@@ -26,7 +23,7 @@ void sjf_update ()
 				int id2 = threadlist_getid(j);
 				if(!threadlist_running(id2))
 				{
-                    if(threadlist_dt(id) > threadlist_dt(id2))
+                    if(threadlist_get_dt(id) > threadlist_get_dt(id2))
 						run = false;
 				}
 			}
@@ -46,4 +43,6 @@ void sjf_update ()
 
 void sjf_wait ()
 {
+	//atualizamos o numero de cores livres
+	occupied -= threadlist_clear();
 }

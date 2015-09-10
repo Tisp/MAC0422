@@ -6,6 +6,7 @@
 #include "linkedlist.h"
 #include "schedulers/fcfs.h"
 #include "schedulers/sjf.h"
+#include "schedulers/srtn.h"
 
 
 //tamanho máximo do nome de processo
@@ -40,8 +41,8 @@ int main (int argc, char** argv)
 
 	///@todo processamento da linha de comando (escalonador, aquivos de entrada e saida, flag de debug)
 	//ponteiros para as funcoes reais do escalonador, atualizadas de acordo com o escalonador que vai ser usado
-	void(*scheduler_update)(void) = sjf_update;
-	void(*scheduler_wait)(void) = sjf_wait;
+	void(*scheduler_update)(void) = srtn_update;
+	void(*scheduler_wait)(void) = srtn_wait;
 
 
 	//inicializa as estruturas
@@ -88,7 +89,9 @@ int main (int argc, char** argv)
 		}
 
 		//chama as funções do escalonador
+		threadlist_lockall(); //não queremos que as threads mudem de estado enquanto o escalonador decide quais devem rodar
 		scheduler_update(); //atualiza a lista de threads que devem ser executadas de acordo com a lógica do escalonador
+		threadlist_unlockall();
 		threadlist_signalrun(); //roda as threads que devem ser executadas
 		scheduler_wait(); //espera algo de acordo com a lógica do escalonador
 		usleep(1000*10); //esperamos um pouco antes de rodar outra iteração para não gastar CPU demais

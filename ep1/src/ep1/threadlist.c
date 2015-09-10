@@ -15,8 +15,8 @@ struct thread
 	int id; //id da thread
 	bool finished; //indica se a thread ja terminou
 	bool torun; //indica se a thread deve executar
-
 	int dt; //tempo total que a thread deve executar
+	long int runtimems; //tempo que a thread ja rodou em ms
 };
 
 
@@ -32,34 +32,44 @@ static pthread_cond_t finished_cond = PTHREAD_COND_INITIALIZER;
 
 
 //funcao que verifica se a thread deve ser executada, mede o tempo de execução, executa uma operação dummy para gastar CPU e sinaliza quando a thread terminou. Recebe como parametro a thread correspondente a instancia que está sendo executada
-static void thread_func (thread* curr_thread)
+static void thread_func (thread* th)
 {
-	long int total_timems = 0; ///@todo colocar isso dentro do struct de thread
 	int i = 0; ///@todo remover
 
-	while(total_timems < 1000*(curr_thread->dt)) //continua rodando até dar o tempo
+	while(th->runtimems/1000 < th->dt) //continua rodando até dar o tempo
 	{
 		//verifica se essa thread deve executar, caso não espera um sinal para verificar de novo
 		pthread_mutex_lock(&torun_mutex);
-		while(curr_thread->torun == false)
-			pthread_cond_wait(&torun_cond, &torun_mutex);
+		bool parou = false; ///@todo remover
+		if(th->torun == false)
+		{
+			if(i != 0)
+			{
+				printf("pause thread %d at %ds, ran %ds\n", th->id, timer_gets(global_clock), (int)th->runtimems/1000);
+				parou = true;
+			}
+			while(th->torun == false)
+				pthread_cond_wait(&torun_cond, &torun_mutex);
+		}
 		pthread_mutex_unlock(&torun_mutex);
 		timer t = timer_start(); //comecamos a contar o tempo de execucao da thread
 
 		//executa alguma coisa
 		if(i == 0) ///@todo remover
-			printf("start thread %d at %ds\n", curr_thread->id, timer_gets(global_clock));
+			printf("start thread %d at %ds\n", th->id, timer_gets(global_clock));
+		if(parou)
+			printf("continue thread %d at %ds, ran %ds\n", th->id, timer_gets(global_clock), (int)th->runtimems/1000);
 		usleep(1000*100); ///@todo gastar cpu de verdade
 
-		total_timems += timer_getms(t); //somamamos o tempo dessa iteração ao tempo total
+		th->runtimems += timer_getms(t); //somamamos o tempo dessa iteração ao tempo total
 		i++; ///@todo remover
 	}
 
 	//marca que a thread terminou e sinaliza isso
 	pthread_mutex_lock(&finished_mutex);
-	printf("end thread %d at %ds\n", curr_thread->id, timer_gets(global_clock)); ///@todo remover
+	printf("end thread %d at %ds\n", th->id, timer_gets(global_clock)); ///@todo remover
 	///@todo gravar no struct qual o tempo que terminou a thread de acordo com o relógio global
-	curr_thread->finished = true;
+	th->finished = true;
 	pthread_cond_signal(&finished_cond);
 	pthread_mutex_unlock(&finished_mutex);
 }
@@ -131,6 +141,7 @@ int threadlist_create (int dt)
 	add->finished = false;
 	add->torun = false;
 	add->dt = dt;
+	add->runtimems = 0;
 	pthread_create(&add->thread, NULL, (void*(*)(void*))thread_func, (void*)add);
 
 	id++;
@@ -187,10 +198,8 @@ int threadlist_clear ()
 void threadlist_marktorun (int id)
 {
 	//simplesmente mudamos a flag dela, quando sinalizarmos ela vai rodar
-	pthread_mutex_lock(&torun_mutex);
 	///@todo verificar se o numero de cores é respeitado sempre que for colocar uma thread pra rodar
 	get_thread(id)->torun = true;
-	pthread_mutex_unlock(&torun_mutex);
 }
 
 
@@ -198,9 +207,7 @@ void threadlist_marktorun (int id)
 void threadlist_markstop (int id)
 {
 	//simplesmente mudamos a flag dela, quando terminar a iteração atual ela vai parar
-	pthread_mutex_lock(&torun_mutex);
 	get_thread(id)->torun = false;
-	pthread_mutex_unlock(&torun_mutex);
 }
 
 
@@ -288,9 +295,16 @@ bool threadlist_running (int id)
 
 
 
-int threadlist_dt (int id)
+int threadlist_get_dt (int id)
 {
 	return get_thread(id)->dt;
+}
+
+
+
+int threadlist_get_remainingms (int id)
+{
+	return (get_thread(id)->dt*1000) - get_thread(id)->runtimems;
 }
 
 
@@ -312,4 +326,20 @@ bool threadlist_empty ()
 int threadlist_ncores ()
 {
 	return cores;
+}
+
+
+
+void threadlist_lockall ()
+{
+	pthread_mutex_lock(&torun_mutex);
+	pthread_mutex_lock(&finished_mutex);
+}
+
+
+
+void threadlist_unlockall ()
+{
+	pthread_mutex_unlock(&torun_mutex);
+	pthread_mutex_unlock(&finished_mutex);
 }
