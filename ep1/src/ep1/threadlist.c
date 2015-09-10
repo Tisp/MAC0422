@@ -12,6 +12,7 @@ typedef struct thread thread;
 struct thread
 {
 	pthread_t thread; //thread em si
+	char name[NAME_SIZE];
 	int id; //id da thread
 	bool finished; //indica se a thread ja terminou
 	bool torun; //indica se a thread deve executar
@@ -22,6 +23,8 @@ struct thread
 
 static linkedlist threadlist; //lista ligada que guarda as threads
 static int cores; //numero de cores simulados
+static FILE* out_stream; //stream onde vai ser impressa a saida
+static bool debug;
 
 //variaveis de condição (e mutexes associados) que sinalizam quando as threads devem ver se vão executar e quando alguma thread terminou
 static pthread_mutex_t torun_mutex = PTHREAD_MUTEX_INITIALIZER;
@@ -34,40 +37,32 @@ static pthread_cond_t finished_cond = PTHREAD_COND_INITIALIZER;
 //funcao que verifica se a thread deve ser executada, mede o tempo de execução, executa uma operação dummy para gastar CPU e sinaliza quando a thread terminou. Recebe como parametro a thread correspondente a instancia que está sendo executada
 static void thread_func (thread* th)
 {
-	int i = 0; ///@todo remover
-
 	while(th->runtimems/1000 < th->dt) //continua rodando até dar o tempo
 	{
 		//verifica se essa thread deve executar, caso não espera um sinal para verificar de novo
 		pthread_mutex_lock(&torun_mutex);
-		bool parou = false; ///@todo remover
-		if(th->torun == false)
+		bool parou = false;
+		while(th->torun == false)
 		{
-			if(i != 0)
-			{
-				printf("pause thread %d at %ds, ran %ds\n", th->id, timer_gets(global_clock), (int)th->runtimems/1000);
-				parou = true;
-			}
-			while(th->torun == false)
-				pthread_cond_wait(&torun_cond, &torun_mutex);
+			parou = true;
+			pthread_cond_wait(&torun_cond, &torun_mutex);
 		}
 		pthread_mutex_unlock(&torun_mutex);
+
 		timer t = timer_start(); //comecamos a contar o tempo de execucao da thread
 
 		//executa alguma coisa
-		if(i == 0) ///@todo remover
-			printf("start thread %d at %ds\n", th->id, timer_gets(global_clock));
-		if(parou)
-			printf("continue thread %d at %ds, ran %ds\n", th->id, timer_gets(global_clock), (int)th->runtimems/1000);
+		if(debug && parou)
+			fprintf(stderr, "%ds: Rodando thread '%s' [dt=%d] [runtime=%d]\n", timer_gets(global_clock), th->name, th->dt, (int)th->runtimems/1000);
 		usleep(1000*100); ///@todo gastar cpu de verdade
 
 		th->runtimems += timer_getms(t); //somamamos o tempo dessa iteração ao tempo total
-		i++; ///@todo remover
 	}
 
 	//marca que a thread terminou e sinaliza isso
 	pthread_mutex_lock(&finished_mutex);
 	printf("end thread %d at %ds\n", th->id, timer_gets(global_clock)); ///@todo remover
+	fprintf(out_stream, "%s %d %d\n", th->name, timer_gets(global_clock), (int)th->runtimems/1000);
 	///@todo gravar no struct qual o tempo que terminou a thread de acordo com o relógio global
 	th->finished = true;
 	pthread_cond_signal(&finished_cond);
@@ -104,11 +99,13 @@ static void remove_thread (thread* th, int i)
 
 
 
-void threadlist_init (int ncores)
+void threadlist_init (int ncores, FILE* output, bool dbg)
 {
 	//simplesmente iniciamos a lista ligada e copiamos os parametros
 	threadlist = linkedlist_new();
 	cores = ncores;
+	out_stream = output;
+	debug = dbg;
 }
 
 
@@ -130,7 +127,7 @@ void threadlist_destroy ()
 
 
 
-int threadlist_create (int dt)
+int threadlist_create (char* name, int dt)
 {
 	//simplesmente alocamos uma nova thread, copiamos os parametros, iniciamos ela e a adicionamos na lista ligada
 	static int id = 0; //jeito simples de lembrar qual foi o ultimo ID usado
@@ -142,6 +139,8 @@ int threadlist_create (int dt)
 	add->torun = false;
 	add->dt = dt;
 	add->runtimems = 0;
+	for(int i=0; i<NAME_SIZE; i++)
+		add->name[i] = name[i];
 	pthread_create(&add->thread, NULL, (void*(*)(void*))thread_func, (void*)add);
 
 	id++;

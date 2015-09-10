@@ -11,18 +11,22 @@
 #include "util.h"
 
 
+//tamanho máximo do nome de processo
+#define NAME_SIZE 100
+
+
 ///Clock global definido externamente. Deve ser iniciado antes de chamar qualquer função definida neste arquivo, exceto init
 extern timer global_clock;
 
 
-///Inicializar a estrutura, é necessário informar o numero de cores
-void threadlist_init (int ncores);
+///Inicializar a estrutura, é necessário informar o numero de cores, uma stream para imprimir a saida e uma flag indicando se é para imprimir menssagens debug.
+void threadlist_init (int ncores, FILE* output, bool dbg);
 
 ///Destroi a estrutura e as threads que estão contidas nela
 void threadlist_destroy ();
 
 ///Cria uma nova thread com os parametros fornecidos e retorna seu ID
-int threadlist_create (int dt);
+int threadlist_create (char* name, int dt);
 
 ///Remove uma thread que já tenha terminado
 void threadlist_remove (int id);

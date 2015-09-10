@@ -9,10 +9,7 @@
 #include "schedulers/srtn.h"
 
 
-//tamanho máximo do nome de processo
-#define NAME_SIZE 100
-
-///@todo pegar iss do sistema
+///@todo pegar isso do sistema
 #define CORES 2
 
 
@@ -35,18 +32,55 @@ timer global_clock;
 
 int main (int argc, char** argv)
 {
-	freopen("./testdata/input0", "r", stdin); //redirecionamento de entrada
-	setbuf(stdout, NULL); //por seguranca desligamos o buffer do stout
-
-
 	///@todo processamento da linha de comando (escalonador, aquivos de entrada e saida, flag de debug)
+	char* filename_out = "./testdata/output";
+	char* filename_in = "./testdata/input0";
+	int scheduler = 3;
+	bool debug = true;
+
+
 	//ponteiros para as funcoes reais do escalonador, atualizadas de acordo com o escalonador que vai ser usado
-	void(*scheduler_update)(void) = srtn_update;
-	void(*scheduler_wait)(void) = srtn_wait;
+	void(*scheduler_update)(void);
+	void(*scheduler_wait)(void);
+
+	switch(scheduler)
+	{
+		case 1:
+			scheduler_update = fcfs_update;
+			scheduler_wait = fcfs_wait;
+			break;
+
+		case 2:
+			scheduler_update = sjf_update;
+			scheduler_wait = sjf_wait;
+			break;
+
+		case 3:
+			scheduler_update = srtn_update;
+			scheduler_wait = srtn_wait;
+			break;
+
+		case 4:
+			break;
+
+		case 5:
+			break;
+
+		case 6:
+			break;
+
+		default:
+			scheduler_update = fcfs_update;
+			scheduler_wait = fcfs_wait;
+			break;
+	}
+
 
 
 	//inicializa as estruturas
-	threadlist_init(CORES);
+	FILE* stream_out = fopen(filename_out, "w");
+	FILE* stream_in = fopen(filename_in, "r");
+	threadlist_init(CORES, stream_out, debug);
 	linkedlist input = linkedlist_new(); //lista ligada que vai guardar os processos lidos do arquivo de trace
 
 
@@ -54,12 +88,12 @@ int main (int argc, char** argv)
 	int t0;
 	char name[NAME_SIZE];
 	int dt;
-	while(scanf("%d %s %d %*d %*d\n", &t0, name, &dt) == 3)
+	while(fscanf(stream_in, "%d %s %d %*d %*d\n", &t0, name, &dt) == 3)
 	{
 		input_item* item = fmalloc(sizeof(input_item));
 		item->t0 = t0;
 		item->dt = dt;
-		for(int i=0; i<100; i++)
+		for(int i=0; i<NAME_SIZE; i++)
 			item->name[i] = name[i];
 		linkedlist_add(input, item);
 	}
@@ -79,8 +113,9 @@ int main (int argc, char** argv)
 			input_item* item = linkedlist_get(input, i);
 			if(time >= item->t0)
 			{
-				int id = threadlist_create(item->dt);
-				printf("chegou thread %d [dt=%d] at %ds\n", id, item->dt, time); ///@todo remover
+				threadlist_create(item->name, item->dt);
+				if (debug)
+					fprintf(stderr, "%ds: Chegou thread '%s' [dt=%d]\n", time, item->name, item->dt);
 				free(item);
 				linkedlist_delete(input, i);
 				size--;
@@ -102,6 +137,8 @@ int main (int argc, char** argv)
 	///@todo verificar se as estruturas estao mesmo vazias
 	threadlist_destroy();
 	linkedlist_destroy(input);
+	fclose(stream_out);
+	fclose(stream_in);
 
 	return EXIT_SUCCESS;
 }
