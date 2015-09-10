@@ -60,6 +60,10 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="src/ep1/schedulers/fcfs.h" />
+		<Unit filename="src/ep1/schedulers/roundrobin.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/ep1/schedulers/roundrobin.h" />
 		<Unit filename="src/ep1/schedulers/sjf.c">
 			<Option compilerVar="CC" />
 		</Unit>

@@ -14,6 +14,7 @@
 #include "schedulers/fcfs.h"
 #include "schedulers/sjf.h"
 #include "schedulers/srtn.h"
+#include "schedulers/roundrobin.h"
 
 
 //estrutura que guarda os dados de cada processo que vai ser criado
@@ -35,6 +36,13 @@ timer global_clock;
 
 int main (int argc, char** argv)
 {
+	///@todo tirar
+	char* argv2[] = {"./ep1", "4", "./testdata/input0", "./testdata/output", "d"};
+	int argc2 = sizeof(argv2)/sizeof(*argv2);
+	argc = argc2;
+	argv = argv2;
+
+
 	//processamos a linha de comando
 	if(argc!=4 && argc!=5)
 		ERROR("Parametros de linha de comando invalidos");
@@ -69,6 +77,8 @@ int main (int argc, char** argv)
 			break;
 
 		case 4:
+			scheduler_update = roundrobin_update;
+			scheduler_wait = roundrobin_wait;
 			///@todo colocar default se não implementar
 			break;
 
@@ -90,6 +100,7 @@ int main (int argc, char** argv)
 	FILE* stream_in = fopen(filename_in, "r");
 	threadlist_init(sysconf(_SC_NPROCESSORS_CONF), stream_out, debug);
 	linkedlist input = linkedlist_new(); //lista ligada que vai guardar os processos lidos do arquivo de trace
+	roundrobin_init();
 
 
 	//lemos o arquivo de entrada e adicionamos cada linha a lista ligada criada anteriormente
@@ -137,7 +148,6 @@ int main (int argc, char** argv)
 		threadlist_unlockall();
 		threadlist_signalrun(); //roda as threads que devem ser executadas
 		scheduler_wait(); //espera algo de acordo com a lógica do escalonador
-		usleep(1000*10); //esperamos um pouco antes de rodar outra iteração para não gastar CPU demais
 	}
 
 
@@ -146,6 +156,7 @@ int main (int argc, char** argv)
 	linkedlist_destroy(input);
 	fclose(stream_out);
 	fclose(stream_in);
+	roundrobin_destroy();
 
 	return EXIT_SUCCESS;
 }

@@ -28,4 +28,5 @@ void fcfs_wait ()
 {
 	//atualizamos o numero de cores livres
 	occupied -= threadlist_clear();
+	usleep(1000*10); //esperamos um pouco antes de rodar outra iteração para não gastar CPU demais
 }

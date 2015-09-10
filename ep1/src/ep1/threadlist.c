@@ -63,7 +63,7 @@ static void thread_func (thread* th)
 				context_changes++;
 				if(debug)
 				{
-					fprintf(stderr, "%.1fs: Pausando '%s' [dt=%.f2] [runtime=%.1f]\n", timer_getms(global_clock)/1000.0, th->name, th->dt/1000.0, th->runtimems/1000.0);
+					fprintf(stderr, "%.1fs: Pausando '%s' [dt=%.1f] [runtime=%.1f]\n", timer_getms(global_clock)/1000.0, th->name, th->dt/1000.0, th->runtimems/1000.0);
 					fprintf(stderr, "Mudancas de contexto: %d\n", context_changes);
 				}
 			}
