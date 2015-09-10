@@ -20,8 +20,8 @@ struct thread
 };
 
 
-//lista ligada que guarda as threads
-static linkedlist threadlist;
+static linkedlist threadlist; //lista ligada que guarda as threads
+static int cores; //numero de cores simulados
 
 //variaveis de condição (e mutexes associados) que sinalizam quando as threads devem ver se vão executar e quando alguma thread terminou
 static pthread_mutex_t torun_mutex = PTHREAD_MUTEX_INITIALIZER;
@@ -35,9 +35,9 @@ static pthread_cond_t finished_cond = PTHREAD_COND_INITIALIZER;
 static void thread_func (thread* curr_thread)
 {
 	long int total_timems = 0; ///@todo colocar isso dentro do struct de thread
-	static int i = 0; ///@todo remover
+	int i = 0; ///@todo remover
 
-	while(total_timems < 1000*curr_thread->dt) //continua rodando até dar o tempo
+	while(total_timems < 1000*(curr_thread->dt)) //continua rodando até dar o tempo
 	{
 		//verifica se essa thread deve executar, caso não espera um sinal para verificar de novo
 		pthread_mutex_lock(&torun_mutex);
@@ -47,8 +47,9 @@ static void thread_func (thread* curr_thread)
 		timer t = timer_start(); //comecamos a contar o tempo de execucao da thread
 
 		//executa alguma coisa
-		printf("running thread %d iter %d\n", curr_thread->id, i);
-		usleep(1000*1000*0.5);
+		if(i == 0) ///@todo remover
+			printf("start thread %d at %ds\n", curr_thread->id, timer_gets(global_clock));
+		usleep(1000*100); ///@todo gastar cpu de verdade
 
 		total_timems += timer_getms(t); //somamamos o tempo dessa iteração ao tempo total
 		i++; ///@todo remover
@@ -56,7 +57,7 @@ static void thread_func (thread* curr_thread)
 
 	//marca que a thread terminou e sinaliza isso
 	pthread_mutex_lock(&finished_mutex);
-	printf("finished thread %d\n", curr_thread->id); ///@todo remover
+	printf("end thread %d at %ds\n", curr_thread->id, timer_gets(global_clock)); ///@todo remover
 	///@todo gravar no struct qual o tempo que terminou a thread de acordo com o relógio global
 	curr_thread->finished = true;
 	pthread_cond_signal(&finished_cond);
@@ -93,11 +94,11 @@ static void remove_thread (thread* th, int i)
 
 
 
-void threadlist_init ()
+void threadlist_init (int ncores)
 {
-	srand(109283); ///@todo remover
-	//simplesmente iniciamos a lista ligada
+	//simplesmente iniciamos a lista ligada e copiamos os parametros
 	threadlist = linkedlist_new();
+	cores = ncores;
 }
 
 
@@ -155,10 +156,12 @@ void threadlist_remove (int id)
 
 
 
-void threadlist_clear ()
+int threadlist_clear ()
 {
 	//travamos o mutex pois se alguma thread terminar enquando varremos a lista poderiam haver problemas
 	pthread_mutex_lock(&finished_mutex);
+
+	int removed = 0;
 
 	//varremos a lista de threads
 	int size = linkedlist_size(threadlist);
@@ -168,12 +171,15 @@ void threadlist_clear ()
 		if(th->finished == true) //achamos uma que terminou
 		{
 			remove_thread(th, i);
+			removed++;
 			i--;
 			size--;
 		}
 	}
 
 	pthread_mutex_unlock(&finished_mutex);
+
+	return removed;
 }
 
 
@@ -182,6 +188,7 @@ void threadlist_marktorun (int id)
 {
 	//simplesmente mudamos a flag dela, quando sinalizarmos ela vai rodar
 	pthread_mutex_lock(&torun_mutex);
+	///@todo verificar se o numero de cores é respeitado sempre que for colocar uma thread pra rodar
 	get_thread(id)->torun = true;
 	pthread_mutex_unlock(&torun_mutex);
 }
@@ -227,7 +234,7 @@ void threadlist_wait (int id)
 
 void threadlist_waitany ()
 {
-	///@todo comentar ou remover isso
+	///@todo comentar
 	pthread_mutex_lock(&finished_mutex);
 
 	bool any_finished;
@@ -255,6 +262,32 @@ int threadlist_getid (int index)
 
 
 
+/*int threadlist_getid_stopped (int index)
+{
+	ATENCAO, IMPLEMENTACAO MUITO PROVAVELMENTE BUGADA
+	@todo comentar e adicionar vierificacoes
+	int curr = -1;
+	thread* th;
+	int size = linkedlist_size(threadlist);
+	for(int i=0; i<size && curr!=index; i++)
+	{
+		th = (thread*)linkedlist_get(threadlist, i);
+		if(th->torun==false && th->finished==false)
+			curr++;
+	}
+
+	return th->id;
+}*/
+
+
+
+bool threadlist_running (int id)
+{
+	return get_thread(id)->torun;
+}
+
+
+
 int threadlist_size ()
 {
 	return linkedlist_size(threadlist);
@@ -265,4 +298,11 @@ int threadlist_size ()
 bool threadlist_empty ()
 {
 	return linkedlist_size(threadlist) == 0;
+}
+
+
+
+int threadlist_ncores ()
+{
+	return cores;
 }

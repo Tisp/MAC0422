@@ -56,6 +56,10 @@
 		<Unit filename="src/ep1/ep1.c">
 			<Option compilerVar="CC" />
 		</Unit>
+		<Unit filename="src/ep1/schedulers/fcfs.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/ep1/schedulers/fcfs.h" />
 		<Unit filename="src/ep1/schedulers/test.c">
 			<Option compilerVar="CC" />
 		</Unit>

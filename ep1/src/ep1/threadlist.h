@@ -15,8 +15,8 @@
 extern timer global_clock;
 
 
-///Inicializar a estrutura
-void threadlist_init ();
+///Inicializar a estrutura, é necessário informar o numero de cores
+void threadlist_init (int ncores);
 
 ///Destroi a estrutura e as threads que estão contidas nela
 void threadlist_destroy ();
@@ -27,8 +27,8 @@ int threadlist_create (int dt);
 ///Remove uma thread que já tenha terminado
 void threadlist_remove (int id);
 
-///Remove todas as threads que já terminaram
-void threadlist_clear ();
+///Remove todas as threads que já terminaram e retorna quantas foram removidas
+int threadlist_clear ();
 
 ///Marca uma thread para execução quando a função threalist_signalrun for chamadda
 void threadlist_marktorun (int id);
@@ -48,9 +48,18 @@ void threadlist_waitany ();
 ///Retorna o ID da index-ésima thread. É garantido que as threads estão ordenadas do menor para o maior ID
 int threadlist_getid (int index);
 
+/*Retorna o ID da index-ésima thread que não está rodando. É garantido que as threads estão ordenadas do menor para o maior ID
+int threadlist_getid_stopped (int index);*/
+
+///Returna true se a thread esta marcada para rodar e false caso contrario
+bool threadlist_running (int id);
+
 ///Retorna o número de threads na estrutura
 int threadlist_size ();
 
 ///Retorna false se não há nenhuma thread na estrutura e true caso contrário
 bool threadlist_empty ();
+
+///Retorna o numero de cores sendo simulados
+int threadlist_ncores ();
 #endif

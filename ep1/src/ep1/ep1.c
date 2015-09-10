@@ -4,11 +4,15 @@
 #include "util.h"
 #include "threadlist.h"
 #include "linkedlist.h"
-#include "schedulers/test.h"
+#include "schedulers/test.h" ///@todo remover e deletar o arquivo
+#include "schedulers/fcfs.h"
 
 
 //tamanho máximo do nome de processo
 #define NAME_SIZE 100
+
+///@todo pegar iss do sistema
+#define CORES 2
 
 
 //estrutura que guarda os dados de cada processo que vai ser criado
@@ -31,16 +35,19 @@ timer global_clock;
 int main (int argc, char** argv)
 {
 	freopen("./testdata/input0", "r", stdin); //redirecionamento de entrada
+	setbuf(stdout, NULL); //por seguranca desligamos o buffer do stout
 
 
 	///@todo processamento da linha de comando (escalonador, aquivos de entrada e saida, flag de debug)
 	//ponteiros para as funcoes reais do escalonador, atualizadas de acordo com o escalonador que vai ser usado
-	void(*scheduler_update)(void) = test_update;
-	void(*scheduler_wait)(void) = test_wait;
+	void(*scheduler_update)(void) = fcfs_update;
+	void(*scheduler_wait)(void) = fcfs_wait;
+	/*void(*scheduler_update)(void) = test_update;
+	void(*scheduler_wait)(void) = test_wait;*/
 
 
 	//inicializa as estruturas
-	threadlist_init();
+	threadlist_init(CORES);
 	linkedlist input = linkedlist_new(); //lista ligada que vai guardar os processos lidos do arquivo de trace
 
 
@@ -66,13 +73,15 @@ int main (int argc, char** argv)
 	for(int i=0; !(threadlist_empty() && linkedlist_empty(input)); i++)
 	{
 		//varre a entrada procurando quais processos devem ser criados
+		int time = timer_gets(global_clock);
 		int size = linkedlist_size(input);
 		for(int i=0; i<size; i++)
 		{
 			input_item* item = linkedlist_get(input, i);
-			if(timer_gets(global_clock) >= item->t0)
+			if(time >= item->t0)
 			{
 				threadlist_create(item->dt);
+				free(item);
 				linkedlist_delete(input, i);
 				size--;
 				i--;
@@ -80,14 +89,10 @@ int main (int argc, char** argv)
 		}
 
 		//chama as funções do escalonador
-		///@todo remove printfs
-		printf("start run %d at %ds\n", i, timer_gets(global_clock));
 		scheduler_update(); //atualiza a lista de threads que devem ser executadas de acordo com a lógica do escalonador
 		threadlist_signalrun(); //roda as threads que devem ser executadas
 		scheduler_wait(); //espera algo de acordo com a lógica do escalonador
-		threadlist_clear(); //remove as threads que já terminaram da lista
 		usleep(1000*10); //esperamos um pouco antes de rodar outra iteração para não gastar CPU demais
-		printf("end run %d\n\n", i);
 	}
 
 
