@@ -2,11 +2,10 @@
 #include <string.h>
 
 #include "command.h"
-#include "util.h"
 
 int command_total_args(char *str_command) {
 
-	int total = 0;
+	int total = 0;	
 	char *token;
 	char *aux;
 
@@ -34,10 +33,10 @@ Command *command_read(char *str_command) {
 	total_args = command_total_args(str_command);
 	aux = strdup(str_command);
 
-	command = (Command *) fmalloc(sizeof(Command));
+	command = (Command *) malloc(sizeof(Command));
 	command->argc = total_args;
-	command->argv = (char **) fmalloc((total_args + 1) * sizeof(char **));
-
+	command->argv = (char **) malloc((total_args + 1) * sizeof(char **));
+	
 	token = strtok(aux, " ");
 
 	while(token != NULL) {
@@ -48,17 +47,17 @@ Command *command_read(char *str_command) {
 
 	free(aux);
 
-	command->argv[i] = NULL;
+	command->argv[i] = NULL; 
 	return command;
 }
 
 void command_destroy(Command *command) {
 
 	int i = 0;
-
+	
 	for(i = 0; i < command->argc; i++)
 		free(command->argv[i]);
-
+	
 	free(command->argv);
 	free(command);
 
