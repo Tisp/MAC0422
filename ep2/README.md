@@ -7,5 +7,5 @@ make
 
 ## Execução
 ```sh
-./shell
+./ep2
 ```

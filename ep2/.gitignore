@@ -1,4 +1,5 @@
-/src/**/*.o
-/src/**/*.d
-/simulator
-/shell
+/ep2
+/**/__pycache__
+/**/*.pyc
+/mem_ram
+/mem_swap
