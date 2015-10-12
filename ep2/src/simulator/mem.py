@@ -1,12 +1,49 @@
 from io import SEEK_SET
 
 
-class FileMem:
-	"""Interface para lidar com arquivos como se fossem memoria."""
-	def __init__(self, file, size, pagesize):
+class Mem:
+	"""Interface basica de objetos de memoria."""
+
+	def __init__(self, size, pagesize):
+		"""Recebe o tamanho total e o tamanho da pagina."""
 		self.size = size
 		self.pagesize = pagesize
 		self.npages = size//pagesize
+
+	def readbyte(self, pos):
+		"""Retorna o conteudo da posicao de memoria pos."""
+		pass
+
+	def writebyte(self, pos, data):
+		"""Escreve data na posicao de memoria pos."""
+		pass
+
+	def readpage(self, page):
+		"""Le e retorna o conteudo da pagina de indice page."""
+		ret = []
+		for i in range(self.pagesize):
+			pos = self.pagesize*page + i
+			ret.append(self.readbyte(pos))
+		return ret
+
+	def writepage(self, page, data):
+		"""Escreve a pagina data na posicao de indice page."""
+		for i in range(self.pagesize):
+			pos = self.pagesize*page + i
+			self.writebyte(pos, data[i])
+
+	def __str__(self):
+		ret = ''
+		for i in range(self.size):
+			ret += repr(self.readbyte(i)) + ', '
+		return '[' + ret.strip(', ') + ']'
+
+
+class FileMem(Mem):
+	"""Interface para lidar com arquivos como se fossem memoria."""
+
+	def __init__(self, file, size, pagesize):
+		super().__init__(size, pagesize)
 		self.file = open(file, 'w+b', 0)
 		written = self.file.write(bytes([255]*size))
 		assert written == size
@@ -28,20 +65,20 @@ class FileMem:
 		self.file.write(bytes(data))
 
 
-class VirtMem:
+class VirtMem(Mem):
 	"""Junta duas memorias (uma ram e uma swap) em uma memoria virtual."""
 
 	def __init__(self, ram, swap, pager):
 		"""Recebe as memorias ram e swap e uma funcao pager que implementa o algoritmo de subtituicao de pagina."""
+		super().__init__(ram.size+swap.size, ram.pagesize)
 		self.ram = ram
 		self.swap = swap
-		self.pagesize = ram.pagesize
-		self.size = ram.size + swap.size
-		self.npages = self.size // self.pagesize
 		self.pager = pager
-		self.table = []
-		for i in range(ram.npages): self.table.append({'loc':'ram', 'page':i})
-		for i in range(swap.npages): self.table.append({'loc':'swap', 'page':i})
+		self.pagetable = []
+		for i in range(ram.npages):
+			self.pagetable.append({'loc':'ram', 'page':i})
+		for i in range(swap.npages):
+			self.pagetable.append({'loc':'swap', 'page':i})
 
 	def readbyte(self, vpos):
 		rpos = self.fetch(vpos)
@@ -55,22 +92,22 @@ class VirtMem:
 		"""Retorna o endereco da ram onde esta a posicao de memoria virtual vpos (trazendo-a para a ram se necessario)."""
 		vpage = vpos // self.pagesize
 		offset = vpos % self.pagesize
-		if self.table[vpage]['loc'] == 'ram':
-			rpage = self.table[vpage]['page']
+		if self.pagetable[vpage]['loc'] == 'ram':
+			rpage = self.pagetable[vpage]['page']
 		else:
 			vpage_toremove = self.pager(self, vpage)
 			self.swap_page(vpage, vpage_toremove)
-			rpage = self.table[vpage]['page']
+			rpage = self.pagetable[vpage]['page']
 		return self.pagesize*rpage + offset
 
 	def swap_page(self, newpage, oldpage):
 		"""Troca uma pagina que esta no swap(newpage) com uma pagina que esta na ram(oldpage)."""
-		assert self.table[oldpage]['loc']=='ram' and self.table[newpage]['loc']=='swap'
-		realpage = self.table[oldpage]['page']
-		swappage = self.table[newpage]['page']
+		assert self.pagetable[oldpage]['loc']=='ram' and self.pagetable[newpage]['loc']=='swap'
+		realpage = self.pagetable[oldpage]['page']
+		swappage = self.pagetable[newpage]['page']
 		olddata = self.ram.readpage(realpage)
 		newdata = self.swap.readpage(swappage)
 		self.ram.writepage(realpage, newdata)
 		self.swap.writepage(swappage, olddata)
-		self.table[newpage] = {'loc':'ram', 'page':realpage}
-		self.table[oldpage] = {'loc':'swap', 'page':swappage}
+		self.pagetable[newpage] = {'loc':'ram', 'page':realpage}
+		self.pagetable[oldpage] = {'loc':'swap', 'page':swappage}
