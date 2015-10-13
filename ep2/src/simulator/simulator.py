@@ -1,6 +1,7 @@
 from mem import FileMem, VirtMem
 from mem_manager import MemManager
 from linkedlist import LinkedList
+from proc_manager import ProcessManager
 
 
 def pager(virt, new):
@@ -10,9 +11,7 @@ def pager(virt, new):
 
 
 def alloc(manager, size):
-	alloc.base += size
-	alloc.counter += 1
-	return alloc.counter-1, alloc.base-size
+	return manager.alloclist.size - 1
 
 
 def main():
@@ -24,20 +23,27 @@ def main():
 	print(virt)
 
 	print()
-	alloc.counter = 0
-	alloc.base = 0
 	manager = MemManager(virt, alloc)
-	for i in range(1, 4):
-		manager.create(i*10, i*i)
+	print(manager.alloclist)
+	for i in range(2, 4):
+		manager.allocate(i*10, i*i-1)
+		print(manager.alloclist)
+	manager.allocate(200, 3)
+	print(manager.alloclist)
 	print(virt)
-	for i in range(1, 4):
-		print("proc ", i*10, ": ", sep='', end='')
-		for j in range(i*i):
-			print(manager.read(i*10, j), end=' ')
-		print()
 
 	print()
+	for i in [200, 30]:
+		manager.delete(i)
+		print(manager.alloclist)
+
+	print()
+	procman = ProcessManager(manager)
+	proc = procman.create(5, [[0,1], [1,4], [3,2], [5,0], [6,0]])
 	print(manager.alloclist)
+	for i in range(6):
+		procman.runall(i)
+	print(procman.size())
 
 
 if __name__ == '__main__':
