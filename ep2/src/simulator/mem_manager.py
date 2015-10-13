@@ -14,25 +14,25 @@ class MemManager:
 		self.alloclist = LinkedList()
 		self.alloclist.append({'id':None, 'size':self.size, 'base':0, 'occupied':False})
 
-	def allocate(self, id, size):
-		"""Aloca memoria de tamanho size para um processo de com o id fornecido."""
+	def allocate(self, uid, size):
+		"""Aloca memoria de tamanho size para um processo com o uid fornecido."""
 		size = ceil(size/self.allocsize)
 		pos = self.alloc(self, size)
 		new = self.separate(pos, size)
-		new['id'] = id
+		new['id'] = uid
 		for i in range(size*self.allocsize):
-			self.mem.writebyte((self.allocsize*new['base'])+i, id)
+			self.mem.writebyte((self.allocsize*new['base'])+i, uid)
 
-	def delete(self, id):
-		"""Libera a memoria alocada para o processo id."""
-		entry = self.get_alloc(id)
+	def delete(self, uid):
+		"""Libera a memoria alocada para o processo uid."""
+		entry = self.get_alloc(uid)
 		entry['id'] = None
 		entry['occupied'] = False
 		self.join()
 
-	def read(self, id, pos):
-		"""Le uma posicao de memoria do processo com o id fornecido."""
-		pos += self.allocsize + self.get_alloc(id)['base']
+	def read(self, uid, pos):
+		"""Le uma posicao de memoria do processo com o uid fornecido."""
+		pos += self.allocsize + self.get_alloc(uid)['base']
 		return self.mem.readbyte(pos)
 
 	def separate(self, pos, size):
@@ -64,8 +64,8 @@ class MemManager:
 		for i in reversed(toremove):
 			self.alloclist.remove(i)
 
-	def get_alloc(self, id):
+	def get_alloc(self, uid):
 		"""Retorna a entrada do processo com o id fornecido na lista de alocacao."""
 		for i in self.alloclist:
-			if i['id'] == id:
+			if i['id'] == uid:
 				return i
