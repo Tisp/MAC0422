@@ -75,6 +75,9 @@ class VirtMem(Mem):
 		self.ram = ram
 		self.swap = swap
 		self.pager = pager
+		self.readpages = []
+		for i in range(ram.npages):
+			self.readpages.append(False)
 		self.pagetable = []
 		for i in range(ram.npages):
 			self.pagetable.append({'loc':'ram', 'page':i})
@@ -83,12 +86,19 @@ class VirtMem(Mem):
 
 	def readbyte(self, vpos):
 		rpos = self.fetch(vpos)
+		self.readpages[rpos//self.pagesize] = True
 		logging.debug("\t\tLendo endereco {} na posicao da ram {}".format(vpos,rpos))
 		return self.ram.readbyte(rpos)
 
 	def writebyte(self, vpos, data):
 		rpos = self.fetch(vpos)
 		self.ram.writebyte(rpos, data)
+
+	def clear_read(self):
+		"""Limpa os bits de leitura das paginas."""
+		logging.debug("Limpando bits de leitura de pagina")
+		for i in range(self.ram.npages):
+			self.readpages[i] = False
 
 	def fetch(self, vpos):
 		"""Retorna o endereco da ram onde esta a posicao de memoria virtual vpos (trazendo-a para a ram se necessario)."""

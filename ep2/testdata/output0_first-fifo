@@ -11,6 +11,7 @@ Criando processo 2: endtime=2, size=3, accesslist=[(1, 0), (2, 3)]
 Acessando posicao de memoria 0 do processo 1
 	Traduzindo endereco 0 do processo 1 para 2
 		Lendo endereco 2 na posicao da ram 2
+Limpando bits de leitura de pagina
 
 Lista de processos:
 	Processo 0: endtime=2, accesslist=[(1, 1)]
@@ -24,6 +25,7 @@ Lista de alocacao:
 Mem virtual: [0, 0, 1, 1, 1, 1, 2, 2, 2, 2, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255]
 Ram e swap: [0, 0, 1, 1, 1, 1, 2, 2, 2, 2, 255, 255] [255, 255, 255, 255, 255, 255, 255, 255]
 Mapa de paginas: ['ram-0', 'ram-1', 'ram-2', 'ram-3', 'ram-4', 'ram-5', 'swap-0', 'swap-1', 'swap-2', 'swap-3']
+Bits de leitura: [False, False, False, False, False, False]
 
 --------------------------------------------------Iteracao 1--------------------------------------------------
 Criando processo 3: endtime=5, size=3, accesslist=[(1, 2), (2, 3), (3, 0), (4, 1), (5, 3)]
@@ -65,6 +67,7 @@ Lista de alocacao:
 Mem virtual: [0, 0, 1, 1, 1, 1, 2, 2, 2, 2, 3, 3, 3, 3, 4, 4, 255, 255, 255, 255]
 Ram e swap: [3, 3, 4, 4, 0, 0, 255, 255, 2, 2, 3, 3] [1, 1, 1, 1, 2, 2, 255, 255]
 Mapa de paginas: ['ram-2', 'swap-1', 'swap-0', 'swap-2', 'ram-4', 'ram-5', 'ram-0', 'ram-1', 'ram-3', 'swap-3']
+Bits de leitura: [True, False, True, True, False, False]
 
 --------------------------------------------------Iteracao 2--------------------------------------------------
 Acessando posicao de memoria 3 do processo 1
@@ -97,6 +100,7 @@ Lista de alocacao:
 Mem virtual: [0, 0, 1, 1, 1, 1, 2, 2, 2, 2, 3, 3, 3, 3, 4, 4, 255, 255, 255, 255]
 Ram e swap: [3, 3, 4, 4, 0, 0, 255, 255, 1, 1, 2, 2] [3, 3, 1, 1, 2, 2, 255, 255]
 Mapa de paginas: ['ram-2', 'swap-1', 'ram-4', 'swap-2', 'ram-5', 'swap-0', 'ram-0', 'ram-1', 'ram-3', 'swap-3']
+Bits de leitura: [True, False, True, True, True, True]
 
 --------------------------------------------------Iteracao 3--------------------------------------------------
 Criando processo 5: endtime=5, size=2, accesslist=[(3, 2), (5, 1)]
@@ -124,6 +128,7 @@ Acessando posicao de memoria 0 do processo 7
 Acessando posicao de memoria 4 do processo 7
 	Traduzindo endereco 4 do processo 7 para 10
 		Lendo endereco 10 na posicao da ram 4
+Limpando bits de leitura de pagina
 
 Lista de processos:
 	Processo 1: endtime=4, accesslist=[(4, 4)]
@@ -140,6 +145,7 @@ Lista de alocacao:
 Mem virtual: [5, 5, 1, 1, 1, 1, 7, 7, 7, 7, 3, 3, 3, 3, 6, 6, 6, 6, 6, 6]
 Ram e swap: [6, 6, 7, 7, 3, 3, 1, 1, 1, 1, 7, 7] [5, 5, 6, 6, 6, 6, 3, 3]
 Mapa de paginas: ['swap-0', 'ram-3', 'ram-4', 'ram-1', 'ram-5', 'ram-2', 'swap-3', 'swap-2', 'swap-1', 'ram-0']
+Bits de leitura: [False, False, False, False, False, False]
 
 --------------------------------------------------Iteracao 4--------------------------------------------------
 Acessando posicao de memoria 4 do processo 1
@@ -172,6 +178,7 @@ Lista de alocacao:
 Mem virtual: [5, 5, 1, 1, 1, 1, 7, 7, 7, 7, 3, 3, 3, 3, 6, 6, 6, 6, 6, 6]
 Ram e swap: [6, 6, 7, 7, 3, 3, 1, 1, 1, 1, 7, 7] [5, 5, 6, 6, 6, 6, 3, 3]
 Mapa de paginas: ['swap-0', 'ram-3', 'ram-4', 'ram-1', 'ram-5', 'ram-2', 'swap-3', 'swap-2', 'swap-1', 'ram-0']
+Bits de leitura: [True, True, True, False, False, True]
 
 --------------------------------------------------Iteracao 5--------------------------------------------------
 Criando processo 8: endtime=6, size=5, accesslist=[(5, 3), (6, 1)]
@@ -203,6 +210,7 @@ Lista de alocacao:
 Mem virtual: [5, 5, 8, 8, 8, 8, 8, 8, 7, 7, 3, 3, 3, 3, 6, 6, 6, 6, 6, 6]
 Ram e swap: [8, 8, 8, 8, 3, 3, 8, 8, 3, 3, 5, 5] [7, 7, 6, 6, 6, 6, 6, 6]
 Mapa de paginas: ['ram-5', 'ram-3', 'ram-0', 'ram-1', 'swap-0', 'ram-2', 'ram-4', 'swap-2', 'swap-1', 'swap-3']
+Bits de leitura: [True, True, True, False, True, True]
 
 --------------------------------------------------Iteracao 6--------------------------------------------------
 Acessando posicao de memoria 1 do processo 8
@@ -210,6 +218,7 @@ Acessando posicao de memoria 1 do processo 8
 		Lendo endereco 3 na posicao da ram 7
 Deletando processo 8: endtime=6, accesslist=[]
 	Removendo segmento de tamanho 6 com base em 2 do processo 8
+Limpando bits de leitura de pagina
 
 Lista de processos:
 Lista de alocacao:
@@ -217,4 +226,5 @@ Lista de alocacao:
 Mem virtual: [5, 5, 8, 8, 8, 8, 8, 8, 7, 7, 3, 3, 3, 3, 6, 6, 6, 6, 6, 6]
 Ram e swap: [8, 8, 8, 8, 3, 3, 8, 8, 3, 3, 5, 5] [7, 7, 6, 6, 6, 6, 6, 6]
 Mapa de paginas: ['ram-5', 'ram-3', 'ram-0', 'ram-1', 'swap-0', 'ram-2', 'ram-4', 'swap-2', 'swap-1', 'swap-3']
+Bits de leitura: [False, False, False, False, False, False]
 

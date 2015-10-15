@@ -16,8 +16,8 @@ def main(ramfile, swapfile, pagesize, filename, pager, allocator, debugtime):
 	swapfile = 'mem_swap'
 	pagesize = 2
 	debugtime = 2
-	pager = 2
 	allocator = 1
+	pager = 2
 
 	#leitura dos parametros
 	inputfile = open(filename)
@@ -51,6 +51,8 @@ def main(ramfile, swapfile, pagesize, filename, pager, allocator, debugtime):
 			del inputlines[0]
 		proc_man.runall(time)
 		proc_man.clean(time)
+		if time%pagers.cleartime==0:
+			virt.clear_read()
 		time += 1
 
 		logging.info("\nLista de processos:")
@@ -62,8 +64,9 @@ def main(ramfile, swapfile, pagesize, filename, pager, allocator, debugtime):
 			logging.info("\tId={}, ocupado={}, base={}, size={}".format(i['id'],i['occupied'],i['base'],i['size']))
 		logging.info("Mem virtual: {}".format(virt))
 		logging.info("Ram e swap: {} {}".format(ram,swap))
-		logging.info("Mapa de paginas: {}\n".format([x['loc']+'-'+str(x['page']) for x in virt.pagetable]))
+		logging.info("Mapa de paginas: {}".format([x['loc']+'-'+str(x['page']) for x in virt.pagetable]))
+		logging.info("Bits de leitura: {}\n".format(virt.readpages))
 
 
-#if __name__ == '__main__':
-	#main()
+if __name__ == '__main__':
+	main(None, None, None, None, None, None, None)
