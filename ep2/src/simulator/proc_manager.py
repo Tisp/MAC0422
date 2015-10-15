@@ -8,11 +8,16 @@ class ProcessManager:
 		"""Recebe um gerenciador de memoria apenas."""
 		self.manager = manager
 		self.proclist = [None]*255
+		self.last_uid = -1
 
 	def create(self, endtime, size, accesslist):
 		"""Recebe o instante final, o tamanho e a lista de acessos a memoria de um processo e o cria."""
-		uid = self.proclist.index(None)
-		logging.debug("Criando processo {}: endtime={}, accesslist={}".format(uid,endtime,accesslist))
+		once = True
+		while self.proclist[self.last_uid] is not None or once:
+			self.last_uid = (self.last_uid+1) % 255
+			once = False
+		uid = self.last_uid
+		logging.debug("Criando processo {}: endtime={}, size={}, accesslist={}".format(uid,endtime,size,accesslist))
 		self.manager.allocate(uid, size)
 		self.proclist[uid] = {'endtime':endtime, 'accesslist':accesslist}
 

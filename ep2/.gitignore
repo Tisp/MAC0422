@@ -3,3 +3,5 @@
 /**/*.pyc
 /mem_ram
 /mem_swap
+
+/testdata/out

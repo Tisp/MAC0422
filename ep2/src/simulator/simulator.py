@@ -39,7 +39,7 @@ def main():
 		inputlines.append(new)
 
 	#inicializacao das estruturas
-	pager.last = 0
+	pager.last = -1
 	ram = FileMem(ramfile, ramsize, pagesize)
 	swap = FileMem(swapfile, swapsize, pagesize)
 	virt = VirtMem(ram, swap, pager)
@@ -49,24 +49,25 @@ def main():
 	#loop principal
 	time = 0;
 	while proc_man.size()>0 or len(inputlines)>0:
-		logging.info("-"*50 + "Iteracao {}:".format(time) + "-"*50)
+		logging.info("-"*50 + "Iteracao {}".format(time) + "-"*50)
 
-		proc_man.clean(time)
 		while len(inputlines)>0 and inputlines[0][0]==time:
 			proc_man.create(*inputlines[0][1:])
 			del inputlines[0]
 		proc_man.runall(time)
+		proc_man.clean(time)
 		time += 1
 
-		logging.info("\nProcesslist:")
+		logging.info("\nLista de processos:")
 		for i,x in enumerate(proc_man.proclist):
 			if x is not None:
 				logging.info("\tProcesso {}: endtime={}, accesslist={}".format(i, x['endtime'], x['accesslist']))
-		logging.info("Alloclist:")
+		logging.info("Lista de alocacao:")
 		for i in mem_man.alloclist:
 			logging.info("\tId={}, ocupado={}, base={}, size={}".format(i['id'],i['occupied'],i['base'],i['size']))
 		logging.info("Mem virtual: {}".format(virt))
-		logging.info("Ram e swap: {} {}\n".format(ram,swap))
+		logging.info("Ram e swap: {} {}".format(ram,swap))
+		logging.info("Mapa de paginas: {}\n".format([x['loc']+'-'+str(x['page']) for x in virt.pagetable]))
 
 
 if __name__ == '__main__':

@@ -14,7 +14,6 @@ class MemManager:
 		self.size = mem.npages
 		self.alloclist = LinkedList()
 		self.alloclist.append({'id':None, 'size':self.size, 'base':0, 'occupied':False})
-		logging
 
 	def allocate(self, uid, size):
 		"""Aloca memoria de tamanho size para um processo com o uid fornecido."""
@@ -22,14 +21,15 @@ class MemManager:
 		pos = self.alloc(self, size)
 		new = self.separate(pos, size)
 		new['id'] = uid
-		logging.debug("\tAlocando segmento de tamanho {} comecando em {} para processo {}".format(size,new['base'],uid))
+		logging.debug("\tAlocando segmento de tamanho {} com base em {} para processo {}".format(size*self.allocsize,new['base']*self.allocsize,uid))
+		logging.debug("\tEscrevendo {} nos enderecos de {} a {}".format(uid,new['base']*self.allocsize,new['base']*self.allocsize+size*self.allocsize-1))
 		for i in range(size*self.allocsize):
 			self.mem.writebyte((self.allocsize*new['base'])+i, uid)
 
 	def delete(self, uid):
 		"""Libera a memoria alocada para o processo uid."""
 		entry = self.get_alloc(uid)
-		logging.debug("\tRemovendo segmento de tamanho {} em {} do processo {}".format(entry['size'],entry['base'],uid))
+		logging.debug("\tRemovendo segmento de tamanho {} com base em {} do processo {}".format(entry['size']*self.allocsize,entry['base']*self.allocsize,uid))
 		entry['id'] = None
 		entry['occupied'] = False
 		self.join()
@@ -37,7 +37,7 @@ class MemManager:
 	def read(self, uid, pos):
 		"""Le uma posicao de memoria do processo com o uid fornecido."""
 		realpos = self.allocsize*self.get_alloc(uid)['base'] + pos
-		logging.debug("\tTraduzindo endereco {} para {} do processo {}".format(pos,realpos,uid))
+		logging.debug("\tTraduzindo endereco {} do processo {} para {}".format(pos,uid,realpos))
 		return self.mem.readbyte(realpos)
 
 	def separate(self, pos, size):
