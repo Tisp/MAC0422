@@ -1,0 +1,25 @@
+MAC0422 - Sistemas Operacionais - EP2 - 
+Prof: Daniel Macedo Batista
+
+Alunos:
+	* Diego Alvarez - NUSP:
+	* Thiago I. S. Pereira - NUSP:7158534
+
+### SIMULADOR DE GERENCIAMENTE E PAGINACAO DE MEMORIA ###
+
+1 - Instalacao e compilacao:
+
+1.1 - Dependencias:
+	1.1.1 - python3 (https://docs.python.org/3.4/)
+	1.1.2 - bash (http://www.gnu.org/software/bash/)
+
+1.2 - Make
+	Dentro da diretorio raiz do projeto, execute:
+
+	$ make 
+
+1.3 - Execucao do programa
+	Sera gerado um shell script (/bin/bash), ao qual dara inicio ao programa em si.
+	Para executa-lo, dentro do diretorio raiz do projeto, execute:
+
+	$ ./ep2
