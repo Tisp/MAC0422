@@ -1,3 +1,4 @@
+import logging
 from io import SEEK_SET
 
 
@@ -82,6 +83,7 @@ class VirtMem(Mem):
 
 	def readbyte(self, vpos):
 		rpos = self.fetch(vpos)
+		logging.debug("\t\tLendo endereco {} na posicao da ram {}".format(vpos,rpos))
 		return self.ram.readbyte(rpos)
 
 	def writebyte(self, vpos, data):
@@ -96,6 +98,7 @@ class VirtMem(Mem):
 			rpage = self.pagetable[vpage]['page']
 		else:
 			vpage_toremove = self.pager(self, vpage)
+			logging.debug("\t\tPage fault no endereco {}, trocando pagina {} da ram com a pagina {} do swap".format(vpos,self.pagetable[vpage_toremove]['page'],self.pagetable[vpage]['page']))
 			self.swap_page(vpage, vpage_toremove)
 			rpage = self.pagetable[vpage]['page']
 		return self.pagesize*rpage + offset
@@ -111,3 +114,18 @@ class VirtMem(Mem):
 		self.swap.writepage(swappage, olddata)
 		self.pagetable[newpage] = {'loc':'ram', 'page':realpage}
 		self.pagetable[oldpage] = {'loc':'swap', 'page':swappage}
+
+	def __str__(self):
+		"""Le a memoria virtual sem mecher nas paginas, apenas para debug."""
+		ret = ''
+		for i in range(self.size):
+			offset = i % self.pagesize
+			vpage = i // self.pagesize
+			if self.pagetable[vpage]['loc'] == 'ram':
+				dev = self.ram
+			if self.pagetable[vpage]['loc'] == 'swap':
+				dev = self.swap
+			rpage = self.pagetable[vpage]['page']
+			rpos = self.pagesize*rpage + offset
+			ret += str(dev.readbyte(rpos)) + ", "
+		return '[' + ret.strip(', ') + ']'

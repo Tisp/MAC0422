@@ -1,3 +1,6 @@
+import logging
+
+
 class ProcessManager:
 	"""Classe que cuida da gerencia dos processos."""
 
@@ -9,11 +12,13 @@ class ProcessManager:
 	def create(self, endtime, size, accesslist):
 		"""Recebe o instante final, o tamanho e a lista de acessos a memoria de um processo e o cria."""
 		uid = self.proclist.index(None)
+		logging.debug("Criando processo {}: endtime={}, accesslist={}".format(uid,endtime,accesslist))
 		self.manager.allocate(uid, size)
 		self.proclist[uid] = {'endtime':endtime, 'accesslist':accesslist}
 
 	def delete(self, uid):
 		"""Deleta um processo."""
+		logging.debug("Deletando processo {}: endtime={}, accesslist={}".format(uid,self.proclist[uid]['endtime'],self.proclist[uid]['accesslist']))
 		self.manager.delete(uid)
 		self.proclist[uid] = None
 
@@ -22,7 +27,9 @@ class ProcessManager:
 		for i,x in enumerate(self.proclist):
 			if x is not None:
 				while len(x['accesslist'])>0 and x['accesslist'][0][0]==time:
-					self.manager.read(i, x['accesslist'][0][1])
+					pos = x['accesslist'][0][1]
+					logging.debug("Acessando posicao de memoria {} do processo {}".format(pos,i))
+					self.manager.read(i, pos)
 					del x['accesslist'][0]
 
 	def clean(self, time):
