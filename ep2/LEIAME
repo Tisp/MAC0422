@@ -11,15 +11,25 @@ Alunos:
 
 1.1 - Dependencias:
 	1.1.1 - python3 (https://docs.python.org/3.4/)
+
 	1.1.2 - bash (http://www.gnu.org/software/bash/)
 
 1.2 - Make
 	Dentro da diretorio raiz do projeto, execute:
 
-	$ make 
+	$ make
 
 1.3 - Execucao do programa
 	Sera gerado um shell script (/bin/bash), ao qual dara inicio ao programa em si.
 	Para executa-lo, dentro do diretorio raiz do projeto, execute:
 
 	$ ./ep2
+
+2 - Observações:
+
+	2.1 Implemetação e Sistema
+		Este projeto foi testado e implementado Debian GNU/Linux 8.2 (jessie),
+		com python3 versao 3.4.2
+
+	2.2 Valores binários para memória
+		Para representarmos o valor de -1 na memoria, ultilizamos o valor 255
