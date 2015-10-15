@@ -2,20 +2,8 @@ import logging
 from mem import FileMem, VirtMem
 from mem_manager import MemManager
 from proc_manager import ProcessManager
-
-
-def pager(virt, new):
-	"""Implementacao do fifo."""
-	pager.last = (pager.last+1) % virt.ram.npages
-	vpage_old = virt.pagetable.index({'loc':'ram', 'page':pager.last})
-	return vpage_old
-
-
-def alloc(manager, size):
-	"""Implementacao do first-fit."""
-	for i,x in enumerate(manager.alloclist):
-		if x['occupied']==False and x['size']>=size:
-			return i
+import allocators
+import pagers
 
 
 def main():
@@ -39,11 +27,10 @@ def main():
 		inputlines.append(new)
 
 	#inicializacao das estruturas
-	pager.last = -1
 	ram = FileMem(ramfile, ramsize, pagesize)
 	swap = FileMem(swapfile, swapsize, pagesize)
-	virt = VirtMem(ram, swap, pager)
-	mem_man = MemManager(virt, alloc)
+	virt = VirtMem(ram, swap, pagers.fifo)
+	mem_man = MemManager(virt, allocators.nextfit)
 	proc_man = ProcessManager(mem_man)
 
 	#loop principal
@@ -61,7 +48,7 @@ def main():
 		logging.info("\nLista de processos:")
 		for i,x in enumerate(proc_man.proclist):
 			if x is not None:
-				logging.info("\tProcesso {}: endtime={}, accesslist={}".format(i, x['endtime'], x['accesslist']))
+				logging.info("\tProcesso {}: endtime={}, accesslist={}".format(i,x['endtime'],x['accesslist']))
 		logging.info("Lista de alocacao:")
 		for i in mem_man.alloclist:
 			logging.info("\tId={}, ocupado={}, base={}, size={}".format(i['id'],i['occupied'],i['base'],i['size']))
