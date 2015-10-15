@@ -6,15 +6,18 @@ import allocators
 import pagers
 
 
-def main():
+def main(ramfile, swapfile, pagesize, filename, pager, allocator, debugtime):
 	#configurando logger
 	logging.basicConfig(format='%(message)s', level=logging.DEBUG)
 
-	#parametros do programa
-	filename = "testdata/input0"
+	#parametros de debug
+	filename = 'testdata/input0'
 	ramfile = 'mem_ram'
 	swapfile = 'mem_swap'
 	pagesize = 2
+	debugtime = 2
+	pager = 2
+	allocator = 1
 
 	#leitura dos parametros
 	inputfile = open(filename)
@@ -26,11 +29,16 @@ def main():
 		new = (int(line[0]), int(line[2]), int(line[3]), [(int(x),int(y)) for x,y in zip(line[4::2],line[5::2])])
 		inputlines.append(new)
 
+	allocator_nums = {1:'firstfit', 2:'nextfit', 3:'quickfit'}
+	pager_nums = {1:'nru', 2:'fifo', 3:'secondchance', 4:'lru'}
+	allocator = getattr(allocators, allocator_nums[allocator])
+	pager = getattr(pagers, pager_nums[pager])
+
 	#inicializacao das estruturas
 	ram = FileMem(ramfile, ramsize, pagesize)
 	swap = FileMem(swapfile, swapsize, pagesize)
-	virt = VirtMem(ram, swap, pagers.fifo)
-	mem_man = MemManager(virt, allocators.nextfit)
+	virt = VirtMem(ram, swap, pager)
+	mem_man = MemManager(virt, allocator)
 	proc_man = ProcessManager(mem_man)
 
 	#loop principal
@@ -57,5 +65,5 @@ def main():
 		logging.info("Mapa de paginas: {}\n".format([x['loc']+'-'+str(x['page']) for x in virt.pagetable]))
 
 
-if __name__ == '__main__':
-	main()
+#if __name__ == '__main__':
+	#main()
