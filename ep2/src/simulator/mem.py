@@ -92,6 +92,7 @@ class VirtMem(Mem):
 
 	def writebyte(self, vpos, data):
 		rpos = self.fetch(vpos)
+		self.readpages[rpos//self.pagesize] = True
 		self.ram.writebyte(rpos, data)
 
 	def clear_read(self):

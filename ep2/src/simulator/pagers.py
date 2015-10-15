@@ -14,6 +14,12 @@ def secondchance(virt, new):
 		virt.readpages[secondchance.last] = False
 		return secondchance(virt, new)
 
+def nru(virt, new):
+	for i,x in enumerate(virt.readpages):
+		if x == False:
+			return virt.pagetable.index({'loc':'ram', 'page':i})
+	return virt.pagetable.index({'loc':'ram', 'page':0})
+
 
 fifo.last = -1
 secondchance.last = -1

@@ -17,7 +17,7 @@ def main(ramfile, swapfile, pagesize, filename, pager, allocator, debugtime):
 	pagesize = 2
 	debugtime = 2
 	allocator = 1
-	pager = 2
+	pager = 1
 
 	#leitura dos parametros
 	inputfile = open(filename)
