@@ -1,11 +1,12 @@
 def fifo(virt, new, notifify=False):
-	"""Implementacao do fifo."""
+	if notifify: return
 	fifo.last = (fifo.last+1) % virt.ram.npages
 	vpage_old = virt.pagetable.index({'loc':'ram', 'page':fifo.last})
 	return vpage_old
 
 def secondchance(virt, new, notifify=False):
-	"""Implementacao do second chance."""
+	if notifify:
+			return
 	secondchance.last = (secondchance.last+1) % virt.ram.npages
 	if virt.readpages[secondchance.last] == False:
 		vpage_old = virt.pagetable.index({'loc':'ram', 'page':secondchance.last})
@@ -15,10 +16,12 @@ def secondchance(virt, new, notifify=False):
 		return secondchance(virt, new)
 
 def nru(virt, new, notifify=False):
+	if notifify: return
 	for i,x in enumerate(virt.readpages):
 		if x == False:
 			return virt.pagetable.index({'loc':'ram', 'page':i})
-	return virt.pagetable.index({'loc':'ram', 'page':0})
+	nru.last = (nru.last+1) % virt.ram.npages
+	return virt.pagetable.index({'loc':'ram', 'page':nru.last})
 
 def lru(virt, new, notifify=False):
 	if notifify:
@@ -37,5 +40,6 @@ def lru(virt, new, notifify=False):
 
 
 fifo.last = -1
+nru.last = -1
 secondchance.last = -1
 cleartime = 3

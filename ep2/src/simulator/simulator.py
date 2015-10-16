@@ -1,4 +1,5 @@
 import logging
+import time
 from mem import FileMem, VirtMem
 from mem_manager import MemManager
 from proc_manager import ProcessManager
@@ -6,10 +7,7 @@ import allocators
 import pagers
 
 
-def main(ramfile, swapfile, pagesize, filename, pager, allocator, debugtime):
-	#configurando logger
-	logging.basicConfig(format='%(message)s', level=logging.DEBUG)
-
+def main(ramfile, swapfile, pagesize, filename, pager, allocator, debugtime, extradebug=False):
 	#parametros de debug
 	filename = 'testdata/input0'
 	ramfile = 'mem_ram'
@@ -17,7 +15,15 @@ def main(ramfile, swapfile, pagesize, filename, pager, allocator, debugtime):
 	pagesize = 2
 	debugtime = 2
 	allocator = 1
-	pager = 4
+	pager = 2
+	extradebug = True
+	nowait = True
+
+	#configurando logger
+	if extradebug:
+		logging.basicConfig(format='%(message)s', level=logging.DEBUG)
+	else:
+		logging.basicConfig(format='%(message)s', level=logging.CRITICAL)
 
 	#leitura dos parametros
 	inputfile = open(filename)
@@ -43,19 +49,30 @@ def main(ramfile, swapfile, pagesize, filename, pager, allocator, debugtime):
 	pagers.lru.usecounter = [0] * virt.npages
 
 	#loop principal
-	time = 0;
+	seconds = 0;
 	while proc_man.size()>0 or len(inputlines)>0:
-		logging.info("-"*50 + "Iteracao {}".format(time) + "-"*50)
+		logging.info("-"*50 + "Iteracao {}".format(seconds) + "-"*50)
+		start_time = time.time()
 
-		while len(inputlines)>0 and inputlines[0][0]==time:
+		while len(inputlines)>0 and inputlines[0][0]==seconds:
 			proc_man.create(*inputlines[0][1:])
 			del inputlines[0]
-		proc_man.runall(time)
+		proc_man.runall(seconds)
 		pager(virt, None, True)
-		if time%pagers.cleartime==0:
+		if seconds%pagers.cleartime == 0:
 			virt.clear_read()
-		proc_man.clean(time)
-		time += 1
+		proc_man.clean(seconds)
+		seconds += 1
+
+		if seconds%debugtime == 0 and not extradebug:
+			print("Tempo: {}s".format(seconds))
+			print("Mem virtual: {}".format(virt))
+			print("Ram: {}".format(ram))
+			print("Swap: {}".format(swap))
+			print("Lista ligada de alocacao de memoria:")
+			for i in mem_man.alloclist:
+				print("\tId={}, ocupado={}, base={}, size={}".format(i['id'],i['occupied'],i['base'],i['size']))
+			print()
 
 		logging.info("\nLista de processos:")
 		for i,x in enumerate(proc_man.proclist):
@@ -68,7 +85,9 @@ def main(ramfile, swapfile, pagesize, filename, pager, allocator, debugtime):
 		logging.info("Ram e swap: {} {}".format(ram,swap))
 		logging.info("Mapa de paginas: {}".format([x['loc']+'-'+str(x['page']) for x in virt.pagetable]))
 		logging.info("Bits de leitura: {}\n".format(virt.readpages))
-		logging.info("===== {}".format(pagers.lru.usecounter))
+
+		while time.time()-start_time < 1 and not nowait:
+			time.sleep(0.1)
 
 
 if __name__ == '__main__':

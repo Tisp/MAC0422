@@ -13,5 +13,9 @@ def nextfit(manager, size):
 	nextfit.last = -1
 	return nextfit(manager, size)
 
+def quickfit(manager, size):
+	#nao implementado
+	return firstfit(manager, size)
+
 
 nextfit.last = -1

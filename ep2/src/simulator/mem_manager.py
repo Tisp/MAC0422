@@ -30,6 +30,9 @@ class MemManager:
 		"""Libera a memoria alocada para o processo uid."""
 		entry = self.get_alloc(uid)
 		logging.debug("\tRemovendo segmento de tamanho {} com base em {} do processo {}".format(entry['size']*self.allocsize,entry['base']*self.allocsize,uid))
+		logging.debug("\tEscrevendo 255(-1) nos enderecos de {} a {}".format(entry['base']*self.allocsize,entry['base']*self.allocsize+entry['size']*self.allocsize-1))
+		for i in range(entry['size']*self.allocsize):
+			self.mem.writebyte((self.allocsize*entry['base'])+i, 255)
 		entry['id'] = None
 		entry['occupied'] = False
 		self.join()

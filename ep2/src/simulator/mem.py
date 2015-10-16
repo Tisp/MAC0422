@@ -108,11 +108,19 @@ class VirtMem(Mem):
 		if self.pagetable[vpage]['loc'] == 'ram':
 			rpage = self.pagetable[vpage]['page']
 		else:
-			vpage_toremove = self.pager(self, vpage)
-			logging.debug("\t\tPage fault no endereco {}, trocando pagina {} da ram com a pagina {} do swap".format(vpos,self.pagetable[vpage_toremove]['page'],self.pagetable[vpage]['page']))
+			vpage_toremove = self.getfreepage()
+			if vpage_toremove == None:
+				vpage_toremove = self.pager(self, vpage)
+				logging.debug("\t\tPage fault no endereco {}, trocando pagina {} da ram com a pagina {} do swap".format(vpos,self.pagetable[vpage_toremove]['page'],self.pagetable[vpage]['page']))
 			self.swap_page(vpage, vpage_toremove)
 			rpage = self.pagetable[vpage]['page']
 		return self.pagesize*rpage + offset
+
+	def getfreepage(self):
+		for i in range(self.ram.npages):
+			if self.ram.readbyte(i*self.ram.pagesize) == 255:
+				return self.pagetable.index({'loc':'ram', 'page':i})
+		return None
 
 	def swap_page(self, newpage, oldpage):
 		"""Troca uma pagina que esta no swap(newpage) com uma pagina que esta na ram(oldpage)."""
