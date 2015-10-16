@@ -33,3 +33,6 @@ Alunos:
 
 	2.2 Valores binários para memória
 		Para representarmos o valor de -1 na memoria, ultilizamos o valor 255
+	
+	2.3 Opções extras
+		Foi implementado um modo de debug detalhado, que mostra em detalhes a criação de processos, acessos a memória, page faults, etc. Para habilita-lo é necessario editar a linha 19 do aquivo src/simulator/simulator.py e modificar a linha "extradebug = False" para "extradebug = True".

@@ -2,10 +2,10 @@
 Criando processo 0: endtime=2, size=2, accesslist=[(1, 1)]
 	Alocando segmento de tamanho 2 com base em 0 para processo 0
 	Escrevendo 0 nos enderecos de 0 a 1
-Criando processo 1: endtime=4, size=4, accesslist=[(0, 0), (2, 3), (4, 4)]
+Criando processo 1: endtime=4, size=4, accesslist=[(0, 0), (2, 3), (4, 3)]
 	Alocando segmento de tamanho 4 com base em 2 para processo 1
 	Escrevendo 1 nos enderecos de 2 a 5
-Criando processo 2: endtime=2, size=3, accesslist=[(1, 0), (2, 3)]
+Criando processo 2: endtime=2, size=3, accesslist=[(1, 0), (2, 2)]
 	Alocando segmento de tamanho 4 com base em 6 para processo 2
 	Escrevendo 2 nos enderecos de 6 a 9
 Acessando posicao de memoria 0 do processo 1
@@ -15,8 +15,8 @@ Limpando bits de leitura de pagina
 
 Lista de processos:
 	Processo 0: endtime=2, accesslist=[(1, 1)]
-	Processo 1: endtime=4, accesslist=[(2, 3), (4, 4)]
-	Processo 2: endtime=2, accesslist=[(1, 0), (2, 3)]
+	Processo 1: endtime=4, accesslist=[(2, 3), (4, 3)]
+	Processo 2: endtime=2, accesslist=[(1, 0), (2, 2)]
 Lista de alocacao:
 	Id=0, ocupado=True, base=0, size=1
 	Id=1, ocupado=True, base=1, size=2
@@ -28,11 +28,11 @@ Mapa de paginas: ['ram-0', 'ram-1', 'ram-2', 'ram-3', 'ram-4', 'ram-5', 'swap-0'
 Bits de leitura: [False, False, False, False, False, False]
 
 --------------------------------------------------Iteracao 1--------------------------------------------------
-Criando processo 3: endtime=5, size=3, accesslist=[(1, 2), (2, 3), (3, 0), (4, 1), (5, 3)]
+Criando processo 3: endtime=5, size=3, accesslist=[(1, 2), (2, 2), (3, 0), (4, 1), (5, 1)]
 	Alocando segmento de tamanho 4 com base em 10 para processo 3
 	Escrevendo 3 nos enderecos de 10 a 13
 		Page fault no endereco 12, trocando pagina 0 da ram com a pagina 0 do swap
-Criando processo 4: endtime=2, size=2, accesslist=[(1, 2)]
+Criando processo 4: endtime=2, size=2, accesslist=[(1, 1)]
 	Alocando segmento de tamanho 2 com base em 14 para processo 4
 	Escrevendo 4 nos enderecos de 14 a 15
 		Page fault no endereco 14, trocando pagina 1 da ram com a pagina 1 do swap
@@ -46,16 +46,15 @@ Acessando posicao de memoria 0 do processo 2
 Acessando posicao de memoria 2 do processo 3
 	Traduzindo endereco 2 do processo 3 para 12
 		Lendo endereco 12 na posicao da ram 0
-Acessando posicao de memoria 2 do processo 4
-	Traduzindo endereco 2 do processo 4 para 16
-		Page fault no endereco 16, trocando pagina 3 da ram com a pagina 2 do swap
-		Lendo endereco 16 na posicao da ram 6
+Acessando posicao de memoria 1 do processo 4
+	Traduzindo endereco 1 do processo 4 para 15
+		Lendo endereco 15 na posicao da ram 3
 
 Lista de processos:
 	Processo 0: endtime=2, accesslist=[]
-	Processo 1: endtime=4, accesslist=[(2, 3), (4, 4)]
-	Processo 2: endtime=2, accesslist=[(2, 3)]
-	Processo 3: endtime=5, accesslist=[(2, 3), (3, 0), (4, 1), (5, 3)]
+	Processo 1: endtime=4, accesslist=[(2, 3), (4, 3)]
+	Processo 2: endtime=2, accesslist=[(2, 2)]
+	Processo 3: endtime=5, accesslist=[(2, 2), (3, 0), (4, 1), (5, 1)]
 	Processo 4: endtime=2, accesslist=[]
 Lista de alocacao:
 	Id=0, ocupado=True, base=0, size=1
@@ -65,76 +64,79 @@ Lista de alocacao:
 	Id=4, ocupado=True, base=7, size=1
 	Id=None, ocupado=False, base=8, size=2
 Mem virtual: [0, 0, 1, 1, 1, 1, 2, 2, 2, 2, 3, 3, 3, 3, 4, 4, 255, 255, 255, 255]
-Ram e swap: [3, 3, 4, 4, 0, 0, 255, 255, 2, 2, 3, 3] [1, 1, 1, 1, 2, 2, 255, 255]
-Mapa de paginas: ['ram-2', 'swap-1', 'swap-0', 'swap-2', 'ram-4', 'ram-5', 'ram-0', 'ram-1', 'ram-3', 'swap-3']
-Bits de leitura: [True, False, True, True, False, False]
+Ram e swap: [3, 3, 4, 4, 0, 0, 2, 2, 2, 2, 3, 3] [1, 1, 1, 1, 255, 255, 255, 255]
+Mapa de paginas: ['ram-2', 'swap-1', 'swap-0', 'ram-3', 'ram-4', 'ram-5', 'ram-0', 'ram-1', 'swap-2', 'swap-3']
+Bits de leitura: [True, True, True, True, False, True]
 
 --------------------------------------------------Iteracao 2--------------------------------------------------
 Acessando posicao de memoria 3 do processo 1
 	Traduzindo endereco 3 do processo 1 para 5
-		Page fault no endereco 5, trocando pagina 4 da ram com a pagina 0 do swap
-		Lendo endereco 5 na posicao da ram 9
-Acessando posicao de memoria 3 do processo 2
-	Traduzindo endereco 3 do processo 2 para 9
-		Page fault no endereco 9, trocando pagina 5 da ram com a pagina 0 do swap
-		Lendo endereco 9 na posicao da ram 11
-Acessando posicao de memoria 3 do processo 3
-	Traduzindo endereco 3 do processo 3 para 13
-		Lendo endereco 13 na posicao da ram 1
+		Page fault no endereco 5, trocando pagina 3 da ram com a pagina 0 do swap
+		Lendo endereco 5 na posicao da ram 7
+Acessando posicao de memoria 2 do processo 2
+	Traduzindo endereco 2 do processo 2 para 8
+		Lendo endereco 8 na posicao da ram 8
+Acessando posicao de memoria 2 do processo 3
+	Traduzindo endereco 2 do processo 3 para 12
+		Lendo endereco 12 na posicao da ram 0
 Deletando processo 0: endtime=2, accesslist=[]
 	Removendo segmento de tamanho 2 com base em 0 do processo 0
+	Escrevendo 255(-1) nos enderecos de 0 a 1
 Deletando processo 2: endtime=2, accesslist=[]
 	Removendo segmento de tamanho 4 com base em 6 do processo 2
+	Escrevendo 255(-1) nos enderecos de 6 a 9
 Deletando processo 4: endtime=2, accesslist=[]
 	Removendo segmento de tamanho 2 com base em 14 do processo 4
+	Escrevendo 255(-1) nos enderecos de 14 a 15
 
 Lista de processos:
-	Processo 1: endtime=4, accesslist=[(4, 4)]
-	Processo 3: endtime=5, accesslist=[(3, 0), (4, 1), (5, 3)]
+	Processo 1: endtime=4, accesslist=[(4, 3)]
+	Processo 3: endtime=5, accesslist=[(3, 0), (4, 1), (5, 1)]
 Lista de alocacao:
 	Id=None, ocupado=False, base=0, size=1
 	Id=1, ocupado=True, base=1, size=2
 	Id=None, ocupado=False, base=3, size=2
 	Id=3, ocupado=True, base=5, size=2
 	Id=None, ocupado=False, base=7, size=3
-Mem virtual: [0, 0, 1, 1, 1, 1, 2, 2, 2, 2, 3, 3, 3, 3, 4, 4, 255, 255, 255, 255]
-Ram e swap: [3, 3, 4, 4, 0, 0, 255, 255, 1, 1, 2, 2] [3, 3, 1, 1, 2, 2, 255, 255]
-Mapa de paginas: ['ram-2', 'swap-1', 'ram-4', 'swap-2', 'ram-5', 'swap-0', 'ram-0', 'ram-1', 'ram-3', 'swap-3']
-Bits de leitura: [True, False, True, True, True, True]
+Mem virtual: [255, 255, 1, 1, 1, 1, 255, 255, 255, 255, 3, 3, 3, 3, 255, 255, 255, 255, 255, 255]
+Ram e swap: [3, 3, 255, 255, 255, 255, 1, 1, 255, 255, 3, 3] [255, 255, 1, 1, 255, 255, 255, 255]
+Mapa de paginas: ['swap-0', 'swap-1', 'ram-3', 'ram-2', 'ram-4', 'ram-5', 'ram-0', 'ram-1', 'swap-2', 'swap-3']
+Bits de leitura: [True, True, True, True, True, True]
 
 --------------------------------------------------Iteracao 3--------------------------------------------------
-Criando processo 5: endtime=5, size=2, accesslist=[(3, 2), (5, 1)]
+Criando processo 5: endtime=5, size=2, accesslist=[(3, 0), (5, 1)]
 	Alocando segmento de tamanho 2 com base em 0 para processo 5
 	Escrevendo 5 nos enderecos de 0 a 1
-Criando processo 6: endtime=4, size=5, accesslist=[(4, 5)]
+Criando processo 6: endtime=4, size=5, accesslist=[(4, 4)]
 	Alocando segmento de tamanho 6 com base em 14 para processo 6
 	Escrevendo 6 nos enderecos de 14 a 19
-		Page fault no endereco 18, trocando pagina 0 da ram com a pagina 3 do swap
-Criando processo 7: endtime=4, size=4, accesslist=[(3, 0), (3, 4), (4, 2)]
+		Page fault no endereco 18, trocando pagina 4 da ram com a pagina 3 do swap
+Criando processo 7: endtime=4, size=4, accesslist=[(3, 0), (3, 3), (4, 2)]
 	Alocando segmento de tamanho 4 com base em 6 para processo 7
 	Escrevendo 7 nos enderecos de 6 a 9
-		Page fault no endereco 6, trocando pagina 1 da ram com a pagina 2 do swap
+		Page fault no endereco 6, trocando pagina 5 da ram com a pagina 0 do swap
+		Page fault no endereco 8, trocando pagina 0 da ram com a pagina 2 do swap
 Acessando posicao de memoria 0 do processo 3
 	Traduzindo endereco 0 do processo 3 para 10
-		Page fault no endereco 10, trocando pagina 2 da ram com a pagina 0 do swap
-		Lendo endereco 10 na posicao da ram 4
-Acessando posicao de memoria 2 do processo 5
-	Traduzindo endereco 2 do processo 5 para 2
-		Page fault no endereco 2, trocando pagina 3 da ram com a pagina 1 do swap
-		Lendo endereco 2 na posicao da ram 6
+		Page fault no endereco 10, trocando pagina 1 da ram com a pagina 0 do swap
+		Lendo endereco 10 na posicao da ram 2
+Acessando posicao de memoria 0 do processo 5
+	Traduzindo endereco 0 do processo 5 para 0
+		Page fault no endereco 0, trocando pagina 2 da ram com a pagina 0 do swap
+		Lendo endereco 0 na posicao da ram 4
 Acessando posicao de memoria 0 do processo 7
 	Traduzindo endereco 0 do processo 7 para 6
-		Lendo endereco 6 na posicao da ram 2
-Acessando posicao de memoria 4 do processo 7
-	Traduzindo endereco 4 do processo 7 para 10
-		Lendo endereco 10 na posicao da ram 4
+		Lendo endereco 6 na posicao da ram 10
+Acessando posicao de memoria 3 do processo 7
+	Traduzindo endereco 3 do processo 7 para 9
+		Lendo endereco 9 na posicao da ram 1
 Limpando bits de leitura de pagina
 
 Lista de processos:
-	Processo 1: endtime=4, accesslist=[(4, 4)]
-	Processo 3: endtime=5, accesslist=[(4, 1), (5, 3)]
+	Processo 1: endtime=4, accesslist=[(4, 3)]
+	Processo 3: endtime=5, accesslist=[(4, 1), (5, 1)]
 	Processo 5: endtime=5, accesslist=[(5, 1)]
-	Processo 6: endtime=4, accesslist=[(4, 5)]
+	Processo 6: endtime=4, accesslist=[(4, 4)]
 	Processo 7: endtime=4, accesslist=[(4, 2)]
 Lista de alocacao:
 	Id=5, ocupado=True, base=0, size=1
@@ -143,63 +145,66 @@ Lista de alocacao:
 	Id=3, ocupado=True, base=5, size=2
 	Id=6, ocupado=True, base=7, size=3
 Mem virtual: [5, 5, 1, 1, 1, 1, 7, 7, 7, 7, 3, 3, 3, 3, 6, 6, 6, 6, 6, 6]
-Ram e swap: [6, 6, 7, 7, 3, 3, 1, 1, 1, 1, 7, 7] [5, 5, 6, 6, 6, 6, 3, 3]
-Mapa de paginas: ['swap-0', 'ram-3', 'ram-4', 'ram-1', 'ram-5', 'ram-2', 'swap-3', 'swap-2', 'swap-1', 'ram-0']
+Ram e swap: [7, 7, 3, 3, 5, 5, 1, 1, 6, 6, 7, 7] [6, 6, 1, 1, 3, 3, 6, 6]
+Mapa de paginas: ['ram-2', 'swap-1', 'ram-3', 'ram-5', 'ram-0', 'ram-1', 'swap-2', 'swap-0', 'swap-3', 'ram-4']
 Bits de leitura: [False, False, False, False, False, False]
 
 --------------------------------------------------Iteracao 4--------------------------------------------------
-Acessando posicao de memoria 4 do processo 1
-	Traduzindo endereco 4 do processo 1 para 6
-		Lendo endereco 6 na posicao da ram 2
+Acessando posicao de memoria 3 do processo 1
+	Traduzindo endereco 3 do processo 1 para 5
+		Lendo endereco 5 na posicao da ram 7
 Acessando posicao de memoria 1 do processo 3
 	Traduzindo endereco 1 do processo 3 para 11
-		Lendo endereco 11 na posicao da ram 5
-Acessando posicao de memoria 5 do processo 6
-	Traduzindo endereco 5 do processo 6 para 19
-		Lendo endereco 19 na posicao da ram 1
+		Lendo endereco 11 na posicao da ram 3
+Acessando posicao de memoria 4 do processo 6
+	Traduzindo endereco 4 do processo 6 para 18
+		Lendo endereco 18 na posicao da ram 8
 Acessando posicao de memoria 2 do processo 7
 	Traduzindo endereco 2 do processo 7 para 8
-		Lendo endereco 8 na posicao da ram 10
+		Lendo endereco 8 na posicao da ram 0
 Deletando processo 1: endtime=4, accesslist=[]
 	Removendo segmento de tamanho 4 com base em 2 do processo 1
+	Escrevendo 255(-1) nos enderecos de 2 a 5
+		Page fault no endereco 2, trocando pagina 3 da ram com a pagina 1 do swap
 Deletando processo 6: endtime=4, accesslist=[]
 	Removendo segmento de tamanho 6 com base em 14 do processo 6
+	Escrevendo 255(-1) nos enderecos de 14 a 19
 Deletando processo 7: endtime=4, accesslist=[]
 	Removendo segmento de tamanho 4 com base em 6 do processo 7
+	Escrevendo 255(-1) nos enderecos de 6 a 9
 
 Lista de processos:
-	Processo 3: endtime=5, accesslist=[(5, 3)]
+	Processo 3: endtime=5, accesslist=[(5, 1)]
 	Processo 5: endtime=5, accesslist=[(5, 1)]
 Lista de alocacao:
 	Id=5, ocupado=True, base=0, size=1
 	Id=None, ocupado=False, base=1, size=4
 	Id=3, ocupado=True, base=5, size=2
 	Id=None, ocupado=False, base=7, size=3
-Mem virtual: [5, 5, 1, 1, 1, 1, 7, 7, 7, 7, 3, 3, 3, 3, 6, 6, 6, 6, 6, 6]
-Ram e swap: [6, 6, 7, 7, 3, 3, 1, 1, 1, 1, 7, 7] [5, 5, 6, 6, 6, 6, 3, 3]
-Mapa de paginas: ['swap-0', 'ram-3', 'ram-4', 'ram-1', 'ram-5', 'ram-2', 'swap-3', 'swap-2', 'swap-1', 'ram-0']
-Bits de leitura: [True, True, True, False, False, True]
+Mem virtual: [5, 5, 255, 255, 255, 255, 255, 255, 255, 255, 3, 3, 3, 3, 255, 255, 255, 255, 255, 255]
+Ram e swap: [255, 255, 3, 3, 5, 5, 255, 255, 255, 255, 255, 255] [255, 255, 255, 255, 3, 3, 255, 255]
+Mapa de paginas: ['ram-2', 'swap-1', 'swap-0', 'ram-5', 'ram-0', 'ram-1', 'swap-2', 'swap-3', 'ram-3', 'ram-4']
+Bits de leitura: [True, True, False, True, True, True]
 
 --------------------------------------------------Iteracao 5--------------------------------------------------
 Criando processo 8: endtime=6, size=5, accesslist=[(5, 3), (6, 1)]
 	Alocando segmento de tamanho 6 com base em 2 para processo 8
 	Escrevendo 8 nos enderecos de 2 a 7
-Acessando posicao de memoria 3 do processo 3
-	Traduzindo endereco 3 do processo 3 para 13
-		Page fault no endereco 13, trocando pagina 4 da ram com a pagina 3 do swap
-		Lendo endereco 13 na posicao da ram 9
+Acessando posicao de memoria 1 do processo 3
+	Traduzindo endereco 1 do processo 3 para 11
+		Lendo endereco 11 na posicao da ram 3
 Acessando posicao de memoria 1 do processo 5
 	Traduzindo endereco 1 do processo 5 para 1
-		Page fault no endereco 1, trocando pagina 5 da ram com a pagina 0 do swap
-		Lendo endereco 1 na posicao da ram 11
+		Lendo endereco 1 na posicao da ram 5
 Acessando posicao de memoria 3 do processo 8
 	Traduzindo endereco 3 do processo 8 para 5
-		Page fault no endereco 5, trocando pagina 0 da ram com a pagina 3 do swap
-		Lendo endereco 5 na posicao da ram 1
+		Lendo endereco 5 na posicao da ram 7
 Deletando processo 3: endtime=5, accesslist=[]
 	Removendo segmento de tamanho 4 com base em 10 do processo 3
+	Escrevendo 255(-1) nos enderecos de 10 a 13
 Deletando processo 5: endtime=5, accesslist=[]
 	Removendo segmento de tamanho 2 com base em 0 do processo 5
+	Escrevendo 255(-1) nos enderecos de 0 a 1
 
 Lista de processos:
 	Processo 8: endtime=6, accesslist=[(6, 1)]
@@ -207,24 +212,25 @@ Lista de alocacao:
 	Id=None, ocupado=False, base=0, size=1
 	Id=8, ocupado=True, base=1, size=3
 	Id=None, ocupado=False, base=4, size=6
-Mem virtual: [5, 5, 8, 8, 8, 8, 8, 8, 7, 7, 3, 3, 3, 3, 6, 6, 6, 6, 6, 6]
-Ram e swap: [8, 8, 8, 8, 3, 3, 8, 8, 3, 3, 5, 5] [7, 7, 6, 6, 6, 6, 6, 6]
-Mapa de paginas: ['ram-5', 'ram-3', 'ram-0', 'ram-1', 'swap-0', 'ram-2', 'ram-4', 'swap-2', 'swap-1', 'swap-3']
-Bits de leitura: [True, True, True, False, True, True]
+Mem virtual: [255, 255, 8, 8, 8, 8, 8, 8, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255]
+Ram e swap: [8, 8, 255, 255, 255, 255, 8, 8, 255, 255, 8, 8] [255, 255, 255, 255, 255, 255, 255, 255]
+Mapa de paginas: ['ram-2', 'ram-0', 'ram-3', 'ram-5', 'swap-1', 'swap-2', 'ram-1', 'swap-3', 'swap-0', 'ram-4']
+Bits de leitura: [True, True, True, True, True, True]
 
 --------------------------------------------------Iteracao 6--------------------------------------------------
 Acessando posicao de memoria 1 do processo 8
 	Traduzindo endereco 1 do processo 8 para 3
-		Lendo endereco 3 na posicao da ram 7
+		Lendo endereco 3 na posicao da ram 1
+Limpando bits de leitura de pagina
 Deletando processo 8: endtime=6, accesslist=[]
 	Removendo segmento de tamanho 6 com base em 2 do processo 8
-Limpando bits de leitura de pagina
+	Escrevendo 255(-1) nos enderecos de 2 a 7
 
 Lista de processos:
 Lista de alocacao:
 	Id=None, ocupado=False, base=0, size=10
-Mem virtual: [5, 5, 8, 8, 8, 8, 8, 8, 7, 7, 3, 3, 3, 3, 6, 6, 6, 6, 6, 6]
-Ram e swap: [8, 8, 8, 8, 3, 3, 8, 8, 3, 3, 5, 5] [7, 7, 6, 6, 6, 6, 6, 6]
-Mapa de paginas: ['ram-5', 'ram-3', 'ram-0', 'ram-1', 'swap-0', 'ram-2', 'ram-4', 'swap-2', 'swap-1', 'swap-3']
-Bits de leitura: [False, False, False, False, False, False]
+Mem virtual: [255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255]
+Ram e swap: [255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255] [255, 255, 255, 255, 255, 255, 255, 255]
+Mapa de paginas: ['ram-2', 'ram-0', 'ram-3', 'ram-5', 'swap-1', 'swap-2', 'ram-1', 'swap-3', 'swap-0', 'ram-4']
+Bits de leitura: [True, False, False, True, False, True]
 

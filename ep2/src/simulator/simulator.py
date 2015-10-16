@@ -9,15 +9,15 @@ import pagers
 
 def main(ramfile, swapfile, pagesize, filename, pager, allocator, debugtime, extradebug=False):
 	#parametros de debug
-	filename = 'testdata/input0'
-	ramfile = 'mem_ram'
-	swapfile = 'mem_swap'
-	pagesize = 2
-	debugtime = 2
-	allocator = 1
-	pager = 2
-	extradebug = True
-	nowait = True
+	#filename = 'testdata/input1'
+	#ramfile = 'mem_ram'
+	#swapfile = 'mem_swap'
+	#pagesize = 16
+	#debugtime = 2
+	#allocator = 1
+	#pager = 4
+	extradebug = False
+	nowait = False
 
 	#configurando logger
 	if extradebug:
