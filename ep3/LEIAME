@@ -24,3 +24,8 @@ Alunos:
 	Para executa-lo, dentro do diretorio raiz do projeto, execute:
 
 	$ ./ep3
+
+2 - Organizar esses dados:
+	o nome de cada arquivo so pode ter 33 carateres no maximo, codificados em utf-8
+	cada pasta ocupa um espaco fixo de 3 setores (=12kb) de espaco, e pode ter ate 240 entradas (cada entrada ocupa 50 bytes)
+	o formato de cada entrada em um diretori eh 33b de nome, 1b de tipo (nada, arquivo ou diretorio), 4b para o tamanho e 3x4b para as datas
