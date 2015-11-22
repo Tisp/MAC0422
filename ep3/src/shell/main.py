@@ -45,11 +45,11 @@ def main():
 					elif comm == 'ls':
 						interface.ls(param)
 					elif comm == 'find':
-						interface.find(param)
+						interface.find(param, param2)
 					elif comm == 'df':
 						interface.df()
 					elif comm == 'umount':
-						interface.umount
+						interface.umount()
 				except:
 					print("Command error")
 		else:
