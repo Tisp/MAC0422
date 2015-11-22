@@ -1,5 +1,6 @@
 from . import filesystem
 from . import directory
+import time
 
 
 def test():
@@ -9,27 +10,17 @@ def test():
 		print(filesystem.bitmap)
 		print(filesystem.fat)
 
-		#filesystem.fat = [1, 2, filesystem.fat_marker] + [0]*(filesystem.fat_size-3)
-		#filesystem.bitmap = [True, True, True] + [False]*(filesystem.bitmap_size-3)
-		#filesystem.umount()
-		#return
+		dirname = "/diretorio/"
+		filename = dirname + "arquivo"
 
-		#mkdir("/nivel1_1")
-		#mkdir("/nivel1_2")
-		#mkdir("/nivel1_1/nivel2-1_1")
-		#mkdir("/nivel1_2/nivel2-2_1")
-
-		#rmdir("/nivel1_1/nivel2-1_1")
-		#rmdir("/nivel1_2/nivel2-2_1")
-		#rmdir("/nivel1_1")
-		#rmdir("/nivel1_2")
-
-		#create_file("", "arquivo")
-
-		filename = "/arquivo"
+		#mkdir(dirname)
 		#cp("/home/user/desktop/dev/so/ep3/data/restore.sh", filename)
-		#print(cat(filename))
+
+		print(cat(filename))
+
 		#rm(filename)
+		#rmdir(dirname)
+
 
 		print(filesystem.bitmap)
 		print(filesystem.fat)
@@ -71,9 +62,10 @@ def mkdir(path):
 	newentry.name = name
 	newentry.filetype = 'dir'
 	newentry.size = 0
-	newentry.time_creation = 9
-	newentry.time_modification = 9
-	newentry.time_access = 9
+	now = int(time.time())
+	newentry.time_creation = now
+	newentry.time_modification = now
+	newentry.time_access = now
 	newentry.sector = filesystem.alloc(directory.Directory.size)
 	newentry.commit()
 
@@ -87,6 +79,10 @@ def rmdir(path):
 	filesystem.free(entry.sector)
 	entry.clear()
 	entry.commit()
+	now = int(time.time())
+	dir.entry.time_access = now
+	dir.entry.time_modification = now
+	dir.entry.commit()
 
 
 def ls(path):
@@ -100,11 +96,14 @@ def create_file(base, name):
 	entry.name = name
 	entry.filetype = 'file'
 	entry.size = 0
-	entry.time_creation = 0
-	entry.time_modification = 0
-	entry.time_access = 0
+	now = int(time.time())
+	entry.time_creation = now
+	entry.time_modification = now
+	entry.time_access = now
 	entry.sector = 0
-	entry.commit()
+	dir.entry.time_access = now
+	dir.entry.time_modification = now
+	dir.entry.commit()
 	return entry
 
 
@@ -119,6 +118,7 @@ def cp(origin, destination):
 		entry.sector = filesystem.alloc(size)
 		entry.size = size
 		filesystem.write(entry.sector*filesystem.sector_size, data)
+		entry.commit()
 
 
 def rm(filepath):
@@ -128,17 +128,35 @@ def rm(filepath):
 	if entry.size > 0: filesystem.free(entry.sector)
 	entry.clear()
 	entry.commit()
+	now = int(time.time())
+	dir.entry.time_access = now
+	dir.entry.time_modification = now
+	dir.entry.commit()
 
 
 def cat(filepath):
 	base,name = directory.Directory.splitpath(filepath)
 	dir = filesystem.root.getdir_bypath(base)
 	entry = dir.getentry_byname(name)
+	now = int(time.time())
+	dir.entry.time_access = now
+	dir.entry.time_modification = now
+	dir.entry.commit()
+	entry.time_access = now
+	entry.commit()
 	return filesystem.read(filesystem.sector_size*entry.sector, entry.size).decode('utf-8')
 
 
 def touch(filepath):
-	pass
+	base,name = directory.Directory.splitpath(filepath)
+	dir = filesystem.root.getdir_bypath(base)
+	entry = dir.getentry_byname(name)
+	now = int(time.time())
+	dir.entry.time_access = now
+	dir.entry.time_modification = now
+	dir.entry.commit()
+	entry.time_access = now
+	entry.commit()
 
 
 def find(path, filename):

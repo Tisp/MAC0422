@@ -1,3 +1,4 @@
+from datetime import datetime
 from struct import Struct
 from . import filesystem as fs
 
@@ -52,9 +53,9 @@ class Entry:
 		ret = "Nome: " + str(self.name) + "\n"
 		ret += "Tipo: " + self.filetype + "\n"
 		ret += "Tamanho: " + str(self.size) + " bytes\n"
-		ret += "Data de criacao: " + str(self.time_creation) + "\n"
-		ret += "Data de modificacao: " + str(self.time_modification) + "\n"
-		ret += "Data de acesso: " + str(self.time_access) + "\n"
+		ret += "Data de criacao: " + str(datetime.fromtimestamp(self.time_creation)) + "\n"
+		ret += "Data de modificacao: " + str(datetime.fromtimestamp(self.time_modification)) + "\n"
+		ret += "Data de acesso: " + str(datetime.fromtimestamp(self.time_access)) + "\n"
 		ret += "Setor inicial: " + str(self.sector)
 		return ret
 
@@ -70,14 +71,15 @@ class Directory:
 		self.pos = entry.sector * fs.sector_size
 		self.entries = [None] * self.num_entries
 		self.new = new
+		self.entry = entry
 
 
 	@classmethod
-	def frompos(cls, sector):
+	def frompos(cls, sector, new=False):
 		self = cls.__new__(cls)
 		self.pos = sector * fs.sector_size
 		self.entries = [None] * self.num_entries
-		self.new = False
+		self.new = new
 		return self
 
 
@@ -120,7 +122,7 @@ class Directory:
 		else:
 			entry = self.getentry_bypath(path)
 			if entry.filetype != 'dir': raise Exception("'{}' nao e um diretorio".format(entry.name))
-			return Directory()
+			return Directory(entry)
 
 
 	def __iter__(self):

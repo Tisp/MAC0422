@@ -76,6 +76,16 @@ def flush():
 	device.write(fat_struct.pack(*fat))
 
 
+def zero():
+	global device, bitmap, fat, root
+
+	from . import directory
+	fat = [0] * fat_size
+	bitmap = [False] * bitmap_size
+	alloc(directory.Directory.size)
+	root = directory.Directory.frompos(0, True)
+
+
 def read(pos, size):
 	device.seek(storage_offset + pos)
 	return device.read(size)
