@@ -19,6 +19,16 @@ class Entry:
 			self.clear()
 
 
+	def clear(self):
+		self.name = ''
+		self.filetype = 'empty'
+		self.size = 0
+		self.time_creation = 0
+		self.time_modification = 0
+		self.time_access = 0
+		self.sector = 0
+
+
 	def unpack(self, data):
 		entry = self.entry_struct.unpack(data)
 		self.name = entry[0].decode('utf-8').strip('\0')
@@ -36,16 +46,6 @@ class Entry:
 
 	def commit(self):
 		fs.write(self.pos, self.pack())
-
-
-	def clear(self):
-		self.name = ''
-		self.filetype = 'empty'
-		self.size = 0
-		self.time_creation = 0
-		self.time_modification = 0
-		self.time_access = 0
-		self.sector = 0
 
 
 	def __str__(self):
@@ -118,7 +118,9 @@ class Directory:
 		if path == '':
 			return self
 		else:
-			return Directory(self.getentry_bypath(path))
+			entry = self.getentry_bypath(path)
+			if entry.filetype != 'dir': raise Exception("'{}' nao e um diretorio".format(entry.name))
+			return Directory()
 
 
 	def __iter__(self):

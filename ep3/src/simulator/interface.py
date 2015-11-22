@@ -9,73 +9,27 @@ def test():
 		print(filesystem.bitmap)
 		print(filesystem.fat)
 
-		#pos = (filesystem.fat[0] % (filesystem.fat_size-1)) + 1
-		#filesystem.fat[0] += 1
-
-		#filesystem.bitmap[pos] = (filesystem.bitmap[pos]+1) % 2
-		#filesystem.fat[pos] += 1
-
-		#entry = filesystem.root.getentry(0)
-		#entry.name = 'arquivo'
-		#entry.size = 1
-		#entry.filetype = 'file'
-		#entry.time_creation = 10
-		#entry.time_modification = 100
-		#entry.time_access = 1000
-		#entry.sector = 0
-
-		#entry = filesystem.root.getentry(1)
-		#entry.name = 'pasta'
-		#entry.size = 2
-		#entry.filetype = 'dir'
-		#entry.time_creation = 20
-		#entry.time_modification = 200
-		#entry.time_access = 2000
-		#entry.sector = 3
-		#filesystem.root.commit()
-
-		#dir = directory.Directory(filesystem.root.getentry(1).sector)
-		#for entry in dir:
-			#entry.name = 'dirfile'
-			#entry.size = 3
-			#entry.filetype = 'file'
-			#entry.time_creation = 30
-			#entry.time_modification = 300
-			#entry.time_access = 3000
-			#entry.sector = 0
-		#dir.commit()
-
 		#filesystem.fat = [1, 2, filesystem.fat_marker] + [0]*(filesystem.fat_size-3)
 		#filesystem.bitmap = [True, True, True] + [False]*(filesystem.bitmap_size-3)
 		#filesystem.umount()
 		#return
 
-		#path = "/pasta2"
-		#base,name = directory.Directory.splitpath(path)
-		#dir = filesystem.root.getdir_bypath(base)
+		#mkdir("/nivel1_1")
+		#mkdir("/nivel1_2")
+		#mkdir("/nivel1_1/nivel2-1_1")
+		#mkdir("/nivel1_2/nivel2-2_1")
 
-		#dir.getentry(2).clear()
-		#newentry = dir.getentry_empty()
-		#newentry.name = name
-		#newentry.filetype = 'dir'
-		#newentry.size = 0
-		#newentry.time_creation = 9
-		#newentry.time_modification = 9
-		#newentry.time_access = 9
-		#newentry.sector = filesystem.alloc(120)
-		#newentry.commit()
+		#rmdir("/nivel1_1/nivel2-1_1")
+		#rmdir("/nivel1_2/nivel2-2_1")
+		#rmdir("/nivel1_1")
+		#rmdir("/nivel1_2")
 
-		#directory.Directory(newentry, True).commit()
+		#create_file("", "arquivo")
 
-		mkdir("/nivel1_1")
-		mkdir("/nivel1_2")
-		mkdir("/nivel1_1/nivel2-1_1")
-		mkdir("/nivel1_2/nivel2-2_1")
-
-		rmdir("/nivel1_1/nivel2-1_1")
-		rmdir("/nivel1_2/nivel2-2_1")
-		rmdir("/nivel1_1")
-		rmdir("/nivel1_2")
+		filename = "/arquivo"
+		#cp("/home/user/desktop/dev/so/ep3/data/restore.sh", filename)
+		#print(cat(filename))
+		#rm(filename)
 
 		print(filesystem.bitmap)
 		print(filesystem.fat)
@@ -140,16 +94,47 @@ def ls(path):
 	return str(filesystem.root.getdir_bypath(path))
 
 
+def create_file(base, name):
+	dir = filesystem.root.getdir_bypath(base)
+	entry = dir.getentry_empty()
+	entry.name = name
+	entry.filetype = 'file'
+	entry.size = 0
+	entry.time_creation = 0
+	entry.time_modification = 0
+	entry.time_access = 0
+	entry.sector = 0
+	entry.commit()
+	return entry
+
+
 def cp(origin, destination):
-	pass
+	#@todo testar origem, espaco, etc
+	#@todo copiar arquivo de verdade
+	base,name = directory.Directory.splitpath(destination)
+	with open(origin, "rb") as file_origin:
+		data = file_origin.read()
+		size = len(data)
+		entry = create_file(base, name)
+		entry.sector = filesystem.alloc(size)
+		entry.size = size
+		filesystem.write(entry.sector*filesystem.sector_size, data)
 
 
 def rm(filepath):
-	pass
+	base,name = directory.Directory.splitpath(filepath)
+	dir = filesystem.root.getdir_bypath(base)
+	entry = dir.getentry_byname(name)
+	if entry.size > 0: filesystem.free(entry.sector)
+	entry.clear()
+	entry.commit()
 
 
 def cat(filepath):
-	pass
+	base,name = directory.Directory.splitpath(filepath)
+	dir = filesystem.root.getdir_bypath(base)
+	entry = dir.getentry_byname(name)
+	return filesystem.read(filesystem.sector_size*entry.sector, entry.size).decode('utf-8')
 
 
 def touch(filepath):
