@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.15 (TeX Live 2015/dev/Debian) (preloaded format=pdflatex 2015.7.5)  22 NOV 2015 07:24
+This is pdfTeX, Version 3.14159265-2.6-1.40.15 (TeX Live 2015/dev/Debian) (preloaded format=pdflatex 2015.7.5)  22 NOV 2015 07:39
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -960,8 +960,7 @@ File: lstmisc.sty 2014/09/06 1.5e (Carsten Heinz)
 File: listings.cfg 2014/09/06 1.5e listings configuration
 ))
 Package: listings 2014/09/06 1.5e (Carsten Heinz)
-
-No file slides.aux.
+ (./slides.aux)
 \openout1 = `slides.aux'.
 
 LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 23.
@@ -1055,6 +1054,8 @@ Package: gettitlestring 2010/12/03 v1.4 Cleanup title references (HO)
 LaTeX Info: Redefining \ref on input line 23.
 LaTeX Info: Redefining \pageref on input line 23.
 LaTeX Info: Redefining \nameref on input line 23.
+
+(./slides.out) (./slides.out)
 \@outlinefile=\write5
 \openout5 = `slides.out'.
 
@@ -1127,8 +1128,7 @@ Dictionary: translator-theorem-dictionary, Language: English
 )
 LaTeX Info: Redefining \includegraphics on input line 23.
 \c@lstlisting=\count169
-
-No file slides.nav.
+ (./slides.nav)
 
 LaTeX Font Warning: Font shape `T1/cmss/m/n' in size <4> not available
 (Font)              size <5> substituted on input line 31.
@@ -1176,34 +1176,25 @@ File: umsb.fd 2013/01/14 v3.01 AMS symbols B
 \tf@snm=\write8
 \openout8 = `slides.snm'.
 
-Package atveryend Info: Empty hook `BeforeClearDocument' on input line 155.
-Package atveryend Info: Empty hook `AfterLastShipout' on input line 155.
+Package atveryend Info: Empty hook `BeforeClearDocument' on input line 157.
+Package atveryend Info: Empty hook `AfterLastShipout' on input line 157.
  (./slides.aux)
-Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 155.
-Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 155.
+Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 157.
+Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 157.
+Package rerunfilecheck Info: File `slides.out' has not changed.
+(rerunfilecheck)             Checksum: 7B7B2D1401F6B7E349F0FD9FDCBF511F;680.
 
-
-Package rerunfilecheck Warning: File `slides.out' has changed.
-(rerunfilecheck)                Rerun to get outlines right
-(rerunfilecheck)                or use package `bookmark'.
-
-Package rerunfilecheck Info: Checksums for `slides.out':
-(rerunfilecheck)             Before: <no file>
-(rerunfilecheck)             After:  7B7B2D1401F6B7E349F0FD9FDCBF511F;680.
 
 LaTeX Font Warning: Size substitutions with differences
 (Font)              up to 1.0pt have occurred.
 
-
-LaTeX Warning: Label(s) may have changed. Rerun to get cross-references right.
-
-Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 155.
+Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 157.
  ) 
 Here is how much of TeX's memory you used:
- 18707 strings out of 494996
- 340213 string characters out of 6180490
- 415249 words of memory out of 5000000
- 21480 multiletter control sequences out of 15000+600000
+ 18778 strings out of 494996
+ 340872 string characters out of 6180490
+ 415427 words of memory out of 5000000
+ 21543 multiletter control sequences out of 15000+600000
  18228 words of font info for 48 fonts, out of 8000000 for 9000
  16 hyphenation exceptions out of 8191
  48i,11n,51p,423b,987s stack positions out of 5000i,500n,10000p,200000b,80000s
@@ -1211,10 +1202,10 @@ Here is how much of TeX's memory you used:
 er/.texmf-var/fonts/pk/ljfour/jknappen/ec/ecss1095.600pk> </home/user/.texmf-va
 r/fonts/pk/ljfour/jknappen/ec/ecss1440.600pk></usr/share/texlive/texmf-dist/fon
 ts/type1/public/amsfonts/symbols/msam10.pfb>
-Output written on slides.pdf (11 pages, 50007 bytes).
+Output written on slides.pdf (11 pages, 50784 bytes).
 PDF statistics:
- 227 PDF objects out of 1000 (max. 8388607)
- 88 compressed objects within 1 object stream
+ 262 PDF objects out of 1000 (max. 8388607)
+ 122 compressed objects within 2 object streams
  35 named destinations out of 1000 (max. 500000)
- 43 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 131 words of extra memory for PDF output out of 10000 (max. 10000000)
 
