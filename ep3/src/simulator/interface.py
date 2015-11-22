@@ -183,7 +183,7 @@ def touch(filepath):
 		entry.commit()
 		update(dir)
 	except:
-		create_file(base, name)
+		create_file(base, name).commit()
 
 
 def find(path, filename):
