@@ -5,39 +5,13 @@ import time
 
 def test():
 	try:
-		#filesystem.mount("data/filesystem.bin")
-		mount("data/filesystem.bin")
-
-		print(filesystem.bitmap)
-		print(filesystem.fat)
-		print()
-
-		dirname = "/diretorio/"
-		filename = dirname + "arquivo"
-
-		#mkdir(dirname)
-		#cp("/home/user/desktop/tempos", filename)
-
-		#print(cat(filename))
-
-		#rm(filename)
-		#rmdir(dirname)
-
-		#print(cat("/diretorio/arquivo"))
-		#print(cat("/diretorio/subdir1/subarquivo1"))
-		#rmdir("/diretorio")
-
 		print(filesystem.bitmap)
 		print(filesystem.fat)
 		print()
 		ls_recursive(filesystem.root)
-
-		umount()
+		print()
 
 	except:
-		print("Erro!")
-		try: umount()
-		except: pass
 		raise
 
 
@@ -62,6 +36,11 @@ def check_mounted():
 		raise Exception("Sistema de arquivos nao montado")
 
 
+def flush():
+	if filesystem.device is None: return
+	filesystem.flush()
+
+
 def update(dir):
 	check_mounted()
 	now = int(time.time())
@@ -76,15 +55,16 @@ def mkdir(path):
 	base,name = directory.Directory.splitpath(path)
 	dir = filesystem.root.getdir_bypath(base)
 
+	sector = filesystem.alloc(directory.Directory.size)
 	newentry = dir.getentry_empty()
 	newentry.name = name
 	newentry.filetype = 'dir'
 	newentry.size = 0
+	newentry.sector = sector
 	now = int(time.time())
 	newentry.time_creation = now
 	newentry.time_modification = now
 	newentry.time_access = now
-	newentry.sector = filesystem.alloc(directory.Directory.size)
 	newentry.commit()
 
 	directory.Directory(newentry, True).commit()
@@ -150,6 +130,7 @@ def create_file(base, name):
 	entry.time_creation = now
 	entry.time_modification = now
 	entry.time_access = now
+	update(dir)
 	return entry
 
 
@@ -159,12 +140,12 @@ def cp(origin, destination):
 	with open(origin, "rb") as file_origin:
 		data = file_origin.read()
 		size = len(data)
+		sector = filesystem.alloc(size)
+		filesystem.write(sector*filesystem.sector_size, data)
 		entry = create_file(base, name)
-		entry.sector = filesystem.alloc(size)
+		entry.sector = sector
 		entry.size = size
-		filesystem.write(entry.sector*filesystem.sector_size, data)
 		entry.commit()
-		update(dir)
 
 
 def rm(filepath):
@@ -172,6 +153,7 @@ def rm(filepath):
 	base,name = directory.Directory.splitpath(filepath)
 	dir = filesystem.root.getdir_bypath(base)
 	entry = dir.getentry_byname(name)
+	if entry.filetype != 'file': raise Exception("'{}' nao e um arquivo".format(name))
 	if entry.size > 0: filesystem.free(entry.sector)
 	entry.clear()
 	entry.commit()
@@ -193,10 +175,14 @@ def touch(filepath):
 	check_mounted()
 	base,name = directory.Directory.splitpath(filepath)
 	dir = filesystem.root.getdir_bypath(base)
-	entry = dir.getentry_byname(name)
-	entry.time_access = int(time.time())
-	entry.commit()
-	update(dir)
+
+	try:
+		entry = dir.getentry_byname(name)
+		entry.time_access = int(time.time())
+		entry.commit()
+		update(dir)
+	except:
+		create_file(base, name)
 
 
 def find(path, filename):

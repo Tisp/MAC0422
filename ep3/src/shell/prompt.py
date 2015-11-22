@@ -1,8 +1,7 @@
 class Command:
 
-    argc = 0
-    argv = []
     _valid_commands = ['cp',
+                       'mount',
                        'mkdir',
                        'rmdir',
                        'cat',
@@ -26,7 +25,7 @@ class Command:
             return False
 
         #verifica se os comandos possuem argumentos
-        if self.argv[0] != 'sai' and self.argc == 1:
+        if (self.argv[0] != 'sai' and self.argv[0] != 'df' and self.argv[0] != 'umount') and self.argc == 1:
             self._error = 'Numero de argumentos invalido'
             return False
         return True

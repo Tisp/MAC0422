@@ -1,11 +1,9 @@
 from prompt import *
-from simulator import filesystem, diretory, interface
+from simulator import interface
 import os.path
 
 def main():
 	prompt = Prompt()
-
-	mounted = False
 
 	while True:
 		command = prompt.read()
@@ -14,46 +12,43 @@ def main():
 			if command.argv[0] == 'sai':
 				break
 
-			if command.argv[0] == 'mount':
-				if not mounted and not os.path.isfile(command.argv[1]):
-					#Monta o sistema de arquivos
-					create_filesystem(command.argv[1])
+			comm = command.argv[0]
+			if comm != 'df' and comm != 'umount': param = command.argv[1]
+			if command.argc == 3: param2 = command.argv[2]
 
-				#Monta os sistema de arquivo
-				interface.mount(command.argv[1])
-				mounted = True
+			try:
+				ret = None
+				if comm == 'mount':
+					ret = interface.mount(param)
+				elif comm == 'cp':
+					ret = interface.cp(param, param2)
+				elif comm == 'mkdir':
+					ret = interface.mkdir(param)
+				elif comm == 'rmdir':
+					ret = interface.rmdir(param)
+				elif comm == 'cat':
+					ret = interface.cat(param)
+				elif comm == 'touch':
+					ret = interface.touch(param)
+				elif comm == 'rm':
+					ret = interface.rm(param)
+				elif comm == 'ls':
+					ret = interface.ls(param)
+				elif comm == 'find':
+					ret = interface.find(param, param2)
+				elif comm == 'df':
+					ret = interface.df()
+				elif comm == 'umount':
+					ret = interface.umount()
 
-			#O disco esta montado, pode rodar os comandos
-			if mounted:
-				comm = command.argv[0]
-				param = command.argv[1]
-				if command.argc == 3: param2 = command.argv[2]
+				if ret is not None: print(ret)
+				interface.flush()
 
-				try:
-					if comm == 'cp':
-						interface.cp(param, param2)
-					elif comm == 'mkdir':
-						interface.mkdir(param)
-					elif comm == 'rmdir':
-						interface.rmdir(param)
-					elif comm == 'cat'
-						interface.cat(param)
-					elif comm == 'touch':
-						interface.touch(param)
-					elif comm == 'rm'
-						interface.rm(param)
-					elif comm == 'ls':
-						interface.ls(param)
-					elif comm == 'find':
-						interface.find(param, param2)
-					elif comm == 'df':
-						interface.df()
-					elif comm == 'umount':
-						interface.umount()
-				except:
-					print("Command error")
+			except Exception as ex:
+				print("Erro: " + str(ex))
 		else:
 			print ("%s\n%s" % (command.get_error(), prompt.help()))
+			#interface.test()
 
 
 if __name__ == '__main__':

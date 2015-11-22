@@ -50,20 +50,18 @@ class Entry:
 
 
 	def __str__(self):
-		ret = "Nome: " + str(self.name) + "\n"
+		ret = ''
+		ret += "Nome: " + str(self.name) + "\n"
 		ret += "Tipo: " + self.filetype + "\n"
 		ret += "Tamanho: " + str(self.size) + " bytes\n"
-		ret += "Data de criacao: " + str(datetime.fromtimestamp(self.time_creation)) + "\n"
-		ret += "Data de modificacao: " + str(datetime.fromtimestamp(self.time_modification)) + "\n"
-		ret += "Data de acesso: " + str(datetime.fromtimestamp(self.time_access)) + "\n"
-		ret += "Setor inicial: " + str(self.sector)
+		ret += "Data de modificacao: " + str(datetime.fromtimestamp(self.time_modification))
 		return ret
 
 
 
 class Directory:
 
-	num_entries = 3
+	num_entries = 240
 	size = num_entries * Entry.entry_struct.size
 
 
@@ -132,7 +130,8 @@ class Directory:
 
 	def __str__(self):
 		ret = ''
-		for entry in self: ret += str(entry) + '\n\n'
+		for entry in self:
+			if entry.filetype != 'empty': ret += str(entry) + '\n\n'
 		return ret[:-2]
 
 

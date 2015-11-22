@@ -9,12 +9,12 @@ bitmap = None
 root = None
 
 #opcoes do sistema de arquivos
-sector_size = 50
+sector_size = 4000
 
 #formato binario dos dados
 fmt_options = '<'
 
-bitmap_size = 15
+bitmap_size = 24986
 bitmap_fmt = 'B'
 bitmap_struct = Struct(fmt_options + ceil(bitmap_size/8)*bitmap_fmt)
 
