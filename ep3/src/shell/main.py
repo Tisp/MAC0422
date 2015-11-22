@@ -1,10 +1,6 @@
 from prompt import *
 from simulator import filesystem, diretory, interface
 import os.path
-import subprocess
-
-
-
 
 def main():
 	prompt = Prompt()
