@@ -90,8 +90,9 @@ def rmdir(path):
 		return
 
 	dir = filesystem.root.getdir_bypath(base)
-
 	entry = dir.getentry_byname(name)
+
+	if entry.filetype != 'dir': raise Exception("'{}' nao e um arquivo".format(name))
 
 	rmdir_recurse(directory.Directory(entry))
 	filesystem.free(entry.sector)

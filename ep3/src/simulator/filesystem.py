@@ -114,9 +114,12 @@ def alloc(size):
 
 	for i,block in enumerate(blocks[:-1]):
 		fat[block] = blocks[i+1]
-	fat[blocks[-1]] = fat_marker
 
-	return blocks[0]
+	if len(blocks) > 0:
+		fat[blocks[-1]] = fat_marker
+		return blocks[0]
+	else:
+		return 0
 
 
 def free(block):

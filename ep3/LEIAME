@@ -25,6 +25,11 @@ Alunos:
 
 	$ ./ep3
 
+1.4 - Testes
+	O codigo usado para executar os testes está em "src/tests". Para roda-los
+	deve-se editar o shell script gerado pelo make manualmente e editar os 
+	parametros diretamente no arquivo "src/tests/main.py"
+
 2 - Detalhes de implementação:
 
 2.1 - Codificação

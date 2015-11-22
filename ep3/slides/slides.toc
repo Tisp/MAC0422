@@ -1,0 +1,13 @@
+\beamer@endinputifotherversion {3.33pt}
+\select@language {brazilian}
+\beamer@sectionintoc {1}{Introdu\IeC {\c c}\IeC {\~a}o}{2}{0}{1}
+\beamer@sectionintoc {2}{O simulador}{3}{0}{2}
+\beamer@subsectionintoc {2}{1}{O simulador}{3}{0}{2}
+\beamer@subsectionintoc {2}{2}{O Simulador}{4}{0}{2}
+\beamer@subsectionintoc {2}{3}{O Simulador}{5}{0}{2}
+\beamer@subsectionintoc {2}{4}{O Simulador}{6}{0}{2}
+\beamer@subsectionintoc {2}{5}{Simula\IeC {\c c}\IeC {\~a}o de Sistema de Arquivos}{7}{0}{2}
+\beamer@subsectionintoc {2}{6}{Simula\IeC {\c c}\IeC {\~a}o de Sistema de Arquivos}{8}{0}{2}
+\beamer@subsectionintoc {2}{7}{Testes}{9}{0}{2}
+\beamer@subsectionintoc {2}{8}{Testes}{10}{0}{2}
+\beamer@subsectionintoc {2}{9}{Testes}{11}{0}{2}
