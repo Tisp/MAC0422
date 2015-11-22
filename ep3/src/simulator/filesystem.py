@@ -84,6 +84,7 @@ def zero():
 	bitmap = [False] * bitmap_size
 	alloc(directory.Directory.size)
 	root = directory.Directory.frompos(0, True)
+	root.commit()
 
 
 def read(pos, size):
@@ -98,7 +99,7 @@ def write(pos, data):
 
 def alloc(size):
 	nblocks = ceil(size/sector_size)
-	blocks = [0] * nblocks
+	blocks = [None] * nblocks
 
 	for i in range(nblocks):
 		try:
@@ -106,6 +107,9 @@ def alloc(size):
 			bitmap[block] = True
 			blocks[i] = block
 		except:
+			for block in blocks:
+				if block is not None:
+					bitmap[block] = False
 			raise Exception("Sem espaco livre")
 
 	for i,block in enumerate(blocks[:-1]):

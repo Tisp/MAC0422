@@ -5,58 +5,76 @@ import time
 
 def test():
 	try:
-		filesystem.mount("data/filesystem.bin")
+		#filesystem.mount("data/filesystem.bin")
+		mount("data/filesystem.bin")
 
 		print(filesystem.bitmap)
 		print(filesystem.fat)
+		print()
 
 		dirname = "/diretorio/"
 		filename = dirname + "arquivo"
 
 		#mkdir(dirname)
-		#cp("/home/user/desktop/dev/so/ep3/data/restore.sh", filename)
+		#cp("/home/user/desktop/tempos", filename)
 
-		print(cat(filename))
+		#print(cat(filename))
 
 		#rm(filename)
 		#rmdir(dirname)
 
+		#print(cat("/diretorio/arquivo"))
+		#print(cat("/diretorio/subdir1/subarquivo1"))
+		#rmdir("/diretorio")
 
 		print(filesystem.bitmap)
 		print(filesystem.fat)
-
-		print("==========")
-		print(ls("/"))
-		print("==========")
-		for entry in filesystem.root:
-			if entry.filetype == 'dir':
-				print(ls("/" + entry.name))
-				print("==========")
+		print()
+		ls_recursive(filesystem.root)
 
 		umount()
 
 	except:
 		print("Erro!")
+		try: umount()
+		except: pass
 		raise
 
 
 def mount(filepath):
-	#ve se o arquivo existe e eh do tamanho certo, cria se nao existir
-	pass
+	try:
+		filesystem.mount(filepath)
+	except FileNotFoundError:
+		with open(filepath, 'wb') as f: f.write(bytes([0]*100000000))
+		mount(filepath)
+		filesystem.zero()
+	except:
+		raise Exception("Arquivo {} nao e um sistema de arquivos valido".format(filepath))
 
 
 def umount():
-	if filesystem.device is not None:
-		filesystem.umount()
-	else:
+	check_mounted()
+	filesystem.umount()
+
+
+def check_mounted():
+	if filesystem.device is None:
 		raise Exception("Sistema de arquivos nao montado")
 
 
+def update(dir):
+	check_mounted()
+	now = int(time.time())
+	if dir is not filesystem.root:
+		dir.entry.time_access = now
+		dir.entry.time_modification = now
+		dir.entry.commit()
+
+
 def mkdir(path):
+	check_mounted()
 	base,name = directory.Directory.splitpath(path)
 	dir = filesystem.root.getdir_bypath(base)
-
-	#@todo testar se tem espaco livre, se cabe na base, etc
 
 	newentry = dir.getentry_empty()
 	newentry.name = name
@@ -71,21 +89,52 @@ def mkdir(path):
 
 	directory.Directory(newentry, True).commit()
 
+	update(dir)
+
+
+def rmdir_recurse(dir):
+	for entry in dir:
+		if entry.filetype == 'dir':
+			rmdir_recurse(directory.Directory(entry))
+			filesystem.free(entry.sector)
+		elif entry.filetype == 'file':
+			if entry.size > 0: filesystem.free(entry.sector)
+
 
 def rmdir(path):
+	check_mounted()
 	base,name = directory.Directory.splitpath(path)
+
+	if name == '':
+		filesystem.zero()
+		return
+
 	dir = filesystem.root.getdir_bypath(base)
+
 	entry = dir.getentry_byname(name)
+
+	rmdir_recurse(directory.Directory(entry))
 	filesystem.free(entry.sector)
 	entry.clear()
 	entry.commit()
-	now = int(time.time())
-	dir.entry.time_access = now
-	dir.entry.time_modification = now
-	dir.entry.commit()
+
+	update(dir)
+
+
+def ls_recursive(dir):
+	print(dir)
+	print()
+
+	for entry in dir:
+		if entry.filetype == 'dir':
+			print("==========")
+			print(entry.name)
+			print("==========")
+			ls_recursive(directory.Directory(entry))
 
 
 def ls(path):
+	check_mounted()
 	path = path.strip('/')
 	return str(filesystem.root.getdir_bypath(path))
 
@@ -96,20 +145,16 @@ def create_file(base, name):
 	entry.name = name
 	entry.filetype = 'file'
 	entry.size = 0
+	entry.sector = 0
 	now = int(time.time())
 	entry.time_creation = now
 	entry.time_modification = now
 	entry.time_access = now
-	entry.sector = 0
-	dir.entry.time_access = now
-	dir.entry.time_modification = now
-	dir.entry.commit()
 	return entry
 
 
 def cp(origin, destination):
-	#@todo testar origem, espaco, etc
-	#@todo copiar arquivo de verdade
+	check_mounted()
 	base,name = directory.Directory.splitpath(destination)
 	with open(origin, "rb") as file_origin:
 		data = file_origin.read()
@@ -119,49 +164,44 @@ def cp(origin, destination):
 		entry.size = size
 		filesystem.write(entry.sector*filesystem.sector_size, data)
 		entry.commit()
+		update(dir)
 
 
 def rm(filepath):
+	check_mounted()
 	base,name = directory.Directory.splitpath(filepath)
 	dir = filesystem.root.getdir_bypath(base)
 	entry = dir.getentry_byname(name)
 	if entry.size > 0: filesystem.free(entry.sector)
 	entry.clear()
 	entry.commit()
-	now = int(time.time())
-	dir.entry.time_access = now
-	dir.entry.time_modification = now
-	dir.entry.commit()
+	update(dir)
 
 
 def cat(filepath):
+	check_mounted()
 	base,name = directory.Directory.splitpath(filepath)
 	dir = filesystem.root.getdir_bypath(base)
 	entry = dir.getentry_byname(name)
-	now = int(time.time())
-	dir.entry.time_access = now
-	dir.entry.time_modification = now
-	dir.entry.commit()
-	entry.time_access = now
+	entry.time_access = int(time.time())
 	entry.commit()
+	update(dir)
 	return filesystem.read(filesystem.sector_size*entry.sector, entry.size).decode('utf-8')
 
 
 def touch(filepath):
+	check_mounted()
 	base,name = directory.Directory.splitpath(filepath)
 	dir = filesystem.root.getdir_bypath(base)
 	entry = dir.getentry_byname(name)
-	now = int(time.time())
-	dir.entry.time_access = now
-	dir.entry.time_modification = now
-	dir.entry.commit()
-	entry.time_access = now
+	entry.time_access = int(time.time())
 	entry.commit()
+	update(dir)
 
 
 def find(path, filename):
-	pass
+	check_mounted()
 
 
 def df():
-	pass
+	check_mounted()
