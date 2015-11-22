@@ -1,0 +1,167 @@
+\documentclass{beamer}
+
+\mode<presentation>
+{
+  \usetheme{default}      % or try Darmstadt, Madrid, Warsaw, ...
+  \usecolortheme{default} % or try albatross, beaver, crane, ...
+  \usefonttheme{default}  % or try serif, structurebold, ...
+  \setbeamertemplate{navigation symbols}{}
+  \setbeamertemplate{caption}[numbered]
+} 
+
+\usepackage[brazilian]{babel}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{listings}
+\usepackage{graphicx}
+
+\title[EP3]{EP3 - MAC0422}
+\author {Diego Alvarez, Thiago I. S. Pereira}
+
+\date{\today}
+
+\begin{document}
+\begin{lstlisting}[
+    basicstyle=\tiny
+]
+\end{lstlisting}
+
+\begin{frame}
+  \titlepage
+\end{frame}
+
+
+\section{Introdução}
+
+\begin{frame}{Introdução}
+
+\begin{block}{}
+\par Esta apresentação tem como objetivo exemplificar a implementação do EP3 de MAC0422 - Sistemas Operacionais. \par Iremos apresentar um simulador de sistema de arquivos baseado em FAT, usando bitmaps para gerencia do espaco livre.
+\end{block}
+
+\end{frame}
+
+\section{O simulador}
+
+\subsection{O simulador}
+
+\begin{frame}{O Simulador}
+\par O simulador foi totalmente implementado e testado ultilizando python3 em ambiente GNU/Linux
+\vskip 1cm
+\begin{itemize}
+\setlength\itemsep{1em}
+\item python3 - versão 3.4.2
+\item Debian GNU/Linux 8.2 Jessie
+\end{itemize}
+\end{frame}
+
+\subsection{O Simulador}
+\begin{frame}{O Simulador}
+O simulador e o shell foram implementados separadamente, o shell chamando o simulador como se fosse um programa separado, cada um tendo seus proprios módulos.
+\end{frame}
+
+\subsection{O Simulador}
+\begin{frame}{O Simulador}
+\par O simulador foi dividos nos seguintes modulos:
+\vskip 1cm
+\begin{itemize}
+\setlength\itemsep{1em}
+\item {\bf interface} - Implementa os comandos pedidos no enunciado, se utilizando das outras estruturas para controlar. É o módulo de mais alto nível.
+\item {\bf filesystem } - Implementa a gerencia das estruturas principais (FAT e bitmap) e intermedia o acesso ao arquivo físico. É o modulo de mais baixo nível.
+\item {\bf directory } - Estrutura que corresponde a um diretorio no sistema de arquivos e possui facilidade para manipular suas entradas
+\item {\bf entry } - Estrutura de uma entrada de em diretorio. Mantem os metadados de arquivos e diretorios, sempre estão contidos em um diretorio.
+\end{itemize}
+\end{frame}
+
+\subsection{O Simulador}
+\begin{frame}{O Simulador}
+\par O shell foi dividido nos seguintes modulos:
+\vskip 1cm
+\begin{itemize}
+\setlength\itemsep{1em}
+\item {\bf prompt} - Verifica a entrada do usuário, se todos os comandos e valores correspondem com o enunciado do EP.
+\item {\bf main} - Inicia um shell e com a ajuda do modulo prompt verifica as entradas e executa o simulador com os parametros inseridos
+\end{itemize}
+\end{frame}
+
+\subsection{Simulação de Sistema de Arquivos}
+\begin{frame}{Formato binário}
+\begin{itemize}
+\setlength\itemsep{1em}
+\item \par O sistema de arquivos é composto por 24.986 setores, a FAT ocupa 49.972 bytes e o bitmap 3.124 bytes
+
+\item \par O arquivo binário guarda primeiro o bitmap, seguido pela FAT, seguido pelos setores para armazenamento
+
+\item \par O diretório raiz sempre está nos 3 primeiros setores
+\end{itemize}
+\end{frame}
+
+\subsection{Simulação de Sistema de Arquivos}
+\begin{frame}{Formato binário}
+\begin{itemize}
+\setlength\itemsep{1em}
+\item Os diretorios são formados por uma lista que ocupa 3 blocos (12KB) e comportam um numero fixo de 240 entradas
+\item Cada entrada tem um tamanho de 50 bytes e é composta de 31B para o nome, 1B para o tipo, 4B para o tamanho, 3x4B para as datas e 2B de ponteiro para os dados
+\item Assim cada arqivo/diretório deve ter no máximo 31 bytes (em utf-8) de nome
+\end{itemize}
+\end{frame}
+
+
+\iffalse
+\subsection{Testes}
+\begin{frame}{Testes}
+\begin{itemize}
+\setlength\itemsep{1em}
+\item Ao testar os algoritmos de paginação, o {\bf first fit} foi usado como algoritmo de alocação
+\item Ao testar os algoritmos de alocação, o {\bf FIFO} foi usado como algoritmo de paginação
+\end{itemize}
+\end{frame}
+
+
+\subsection{Testes}
+\begin{frame}{Testes}
+\begin{itemize}
+\setlength\itemsep{1em}
+\item Para comparar os algoritmos de paginação rodamos o mesmo trace para cada um e calculamos o total de {\bf page faults}
+\item Para comparar os algoritmos de alocação rodamos o mesmo trace para cada um e calculamos o total de entradas na tabela de alocação
+\item Para os testes pequenos foi usado um tamanho de pagina de 2 bytes, e para os testes grandes um tamanho de 16 bytes
+\end{itemize}
+\end{frame}
+
+
+\subsection{Testes}
+\begin{frame}{Testes}
+% Please add the following required packages to your document preamble:
+% \usepackage{graphicx}
+\begin{table}[]
+\centering
+\caption{Segmentos de Memória}
+\label{my-label}
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{lcc}
+\hline
+\multicolumn{3}{c}{Nº de Segmentos de Memória}                                       \\ 
+\hline
+          & \multicolumn{1}{l}{Entrada Pequena} & \multicolumn{1}{l}{Entrada Grande} \\
+First Fit & 28                                  & 379                                \\
+Next Fit  & 27                                  & 409                               
+\end{tabular}
+}
+\end{table}
+\end{frame}
+
+\subsection{Testes}
+\begin{frame}{Testes}
+\includegraphics[width=\textwidth]{pagefaults_pequeno.png}
+\end{frame}
+
+\subsection{Testes}
+\begin{frame}{Testes}
+\includegraphics[width=\textwidth]{pagefaults_grande.png}
+\end{frame}
+\fi
+
+
+
+\end{document}
+

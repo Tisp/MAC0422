@@ -25,7 +25,22 @@ Alunos:
 
 	$ ./ep3
 
-2 - Organizar esses dados:
-	o nome de cada arquivo so pode ter 31 carateres no maximo, codificados em utf-8
-	cada pasta ocupa um espaco fixo de 3 setores (=12kb) de espaco, e pode ter ate 240 entradas (cada entrada ocupa 50 bytes)
-	o formato de cada entrada em um diretori eh 31b de nome, 1b de tipo (nada, arquivo ou diretorio), 4b para o tamanho, 3x4b para as datas e 2b de ponteiro para os dados
+2 - Detalhes de implementação:
+
+2.1 - Codificação
+	Os nomes dos arquivos são codificados usando UTF-8, assim como seus conteudos.
+	Todos os dados binários são guardados no formato little-endian.
+	
+2.2 - Diretorios
+	Os diretorios são formados por uma lista que ocupa 3 blocos (12KB) e que comportam
+	um numero fixo de 240 entradas.
+	Cada entrada tem um tamanho de 50 bytes e é composta de 31B para o nome, 1B para o
+	tipo (arquivo, diretorio ou nada), 4B para o tamanho, 3x4B para as datas (guardadas
+	como unix time) e 2B de ponteiro para os dados.
+
+2.3 - Formato binário
+	O sistema de arquivos é composto por 24.986 setores (não é possivel adicionar mais
+	devido ao overhead da FAT e do bitmap), o que equivale a 99,944MB.
+	O arquivo está organizado em bitmap (24.986 entradas de 1 bit = 3.124 bytes), seguido
+	pela FAT (24.986 entradas de 2 bytes = 49.972 bytes) seguido pelos dados em si.
+	O diretório raiz é guardado logo em seguida e sempre ocupa os setores 0, 1 e 2.
