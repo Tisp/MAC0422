@@ -43,8 +43,9 @@ def test():
 
 
 def mount(filepath):
-	#ve se o arquivo existe e eh do tamanho certo, cria se nao existir
-	pass
+    cmd = ['dd', 'if=/dev/zero', 'of='+path, 'bs=100m', 'count=1']
+    a = subprocess.Popen(cmd)
+    a.wait()	
 
 
 def umount():
